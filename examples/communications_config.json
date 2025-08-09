@@ -1,0 +1,10 @@
+{
+  "timeout": 120,
+  "GENERATION_PARAMS": {
+    "temperature": 0.0,
+    "topPSampling": 1.0,
+    "topKSampling": 0,
+    "repeatPenalty": 1.00,
+    "maxTokens": 2000
+  }
+}

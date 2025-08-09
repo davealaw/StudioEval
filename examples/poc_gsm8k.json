@@ -1,0 +1,11 @@
+[
+  {
+    "eval_type": "gsm8k",
+    "dataset_path": "openai/gsm8k",
+    "dataset_name": "gsm8k",
+    "subset": "main",
+    "split": "test",
+    "seed": 42,
+    "sample_size": 10    
+  }  
+]

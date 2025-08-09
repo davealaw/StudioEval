@@ -1,0 +1,19 @@
+[project]
+name = "studioeval"
+version = "0.1.0"
+description = "Lightweight LLM evaluation framework using LM Studio as the inference backend"
+authors = [{ name = "Dave Law" }]
+license = "MIT"
+readme = "README.md"
+requires-python = ">=3.9"
+
+dependencies = [
+    "requests",
+    "datasets",
+    "tqdm",
+    "numpy",
+    "scikit-learn"
+]
+
+[tool.setuptools]
+packages = ["studioeval", "eval_datasets", "models", "utils", "config"]

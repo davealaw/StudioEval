@@ -1,0 +1,10 @@
+[
+  {
+    "eval_type": "grammar",
+    "dataset_path": "eval_datasets/custom/data/grammar_dataset.jsonl",
+    "dataset_name": "grammar",
+    "split": null,
+    "seed": null,
+    "sample_size": null
+  }
+]

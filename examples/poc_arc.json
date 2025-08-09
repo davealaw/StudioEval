@@ -1,0 +1,20 @@
+[
+  {
+    "eval_type": "arc",
+    "dataset_path": "allenai/ai2_arc",
+    "dataset_name": "ai2_arc_easy",
+    "subset": "ARC-Easy",
+    "split": "validation",
+    "seed": 42,
+    "sample_size": 10    
+  },
+  {
+    "eval_type": "arc",
+    "dataset_path": "allenai/ai2_arc",
+    "dataset_name": "ai2_arc_challenge",
+    "subset": "ARC-Challenge",
+    "split": "validation",
+    "seed": 42,
+    "sample_size": 10  
+  }  
+]

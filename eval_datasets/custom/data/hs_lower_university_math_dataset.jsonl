@@ -1,0 +1,100 @@
+{"id": "q_1", "question": "A geometric sequence has first term 3 and common ratio 2. Find the 10th term (integer).", "topic": "sequences and series", "difficulty": "medium", "answer": 1536}
+{"id": "q_2", "question": "Solve for x, give the exact decimal value: 3^(2x+1) = 81.", "topic": "exponents and logarithms", "difficulty": "medium", "answer": 1.5}
+{"id": "q_3", "question": "A circle has radius 5 cm. Compute the arc length for a 120° central angle; round to three decimal places.", "topic": "geometry", "difficulty": "medium", "answer": 10.472}
+{"id": "q_4", "question": "Find the remainder when 2^100 is divided by 7 (integer from 0–6).", "topic": "algebra", "difficulty": "easy", "answer": 2}
+{"id": "q_5", "question": "The mean of five numbers is 22. Four of them are 18, 20, 25, 30. Find the fifth number (integer).", "topic": "algebra", "difficulty": "easy", "answer": 17}
+{"id": "q_6", "question": "Solve log₂(x) + log₂(x-2) = 3; give the exact value.", "topic": "exponents and logarithms", "difficulty": "medium", "answer": 4}
+{"id": "q_7", "question": "A right circular cone has radius 6 cm and height 8 cm. Compute its volume; round to three decimal places.", "topic": "geometry", "difficulty": "medium", "answer": 301.593}
+{"id": "q_8", "question": "Evaluate 12C5 (integer).", "topic": "combinatorics", "difficulty": "easy", "answer": 792}
+{"id": "q_9", "question": "A quadratic has roots 3 and −4 and leading coefficient 1. Find the coefficient b (integer).", "topic": "algebra", "difficulty": "easy", "answer": 1}
+{"id": "q_10", "question": "Find the exact sum of the infinite geometric series 8, 4, 2, 1, … .", "topic": "sequences and series", "difficulty": "medium", "answer": 16}
+{"id": "q_11", "question": "Solve |2x-5| = 11; give the positive solution (integer).", "topic": "algebra", "difficulty": "easy", "answer": 8}
+{"id": "q_12", "question": "A sphere has surface area 100π cm². Find its radius; round to three decimal places.", "topic": "geometry", "difficulty": "medium", "answer": 5.000}
+{"id": "q_13", "question": "Compute |(2+3i)(4-i)|; round to three decimal places.", "topic": "complex numbers", "difficulty": "medium", "answer": 14.866}
+{"id": "q_14", "question": "Evaluate f'(1) for f(x)=x³-6x²+9x+1; round to three decimal places.", "topic": "calculus", "difficulty": "medium", "answer": 0.000}
+{"id": "q_15", "question": "A card is drawn from a standard 52-card deck. Compute the probability it is a heart or a king; round to four decimal places.", "topic": "probability and statistics", "difficulty": "medium", "answer": 0.3077}
+{"id": "q_16", "question": "Evaluate ∫₀¹ (3x²+2x) dx (integer).", "topic": "calculus", "difficulty": "easy", "answer": 2}
+{"id": "q_17", "question": "Find the slope of the line through points (2,3) and (7,11); round to three decimal places.", "topic": "algebra", "difficulty": "easy", "answer": 1.600}
+{"id": "q_18", "question": "Solve sin θ = 0.5 for 0° ≤ θ < 360°; give the smaller positive solution (integer degrees).", "topic": "trigonometry", "difficulty": "easy", "answer": 30}
+{"id": "q_19", "question": "A $10,000 loan earns 5% annual interest compounded quarterly. Compute the amount after 3 years; round to two decimal places.", "topic": "finance", "difficulty": "medium", "answer": 11607.55}
+{"id": "q_20", "question": "Compute the largest real root of x³-6x²+11x-6; round to three decimal places.", "topic": "algebra", "difficulty": "medium", "answer": 3.000}
+{"id": "q_21", "question": "A parallelogram has adjacent sides 8 cm and 10 cm with included angle 60°. Compute its area; round to three decimal places.", "topic": "geometry", "difficulty": "medium", "answer": 69.282}
+{"id": "q_22", "question": "Find the median of 7, 3, 9, 15, 11, 5, 13 (integer).", "topic": "statistics", "difficulty": "easy", "answer": 9}
+{"id": "q_23", "question": "Evaluate det[[2,3],[4,7]] (integer).", "topic": "linear algebra", "difficulty": "easy", "answer": 2}
+{"id": "q_24", "question": "For f(x)=e^(2x) compute f'(0); round to three decimal places.", "topic": "calculus", "difficulty": "medium", "answer": 2.000}
+{"id": "q_25", "question": "Solve the system 2x+3y=12, 4x-y=5; give x; round to three decimal places.", "topic": "algebra", "difficulty": "medium", "answer": 1.929}
+{"id": "q_26", "question": "A fair coin is tossed 5 times. Compute the probability of exactly 3 heads; round to four decimal places.", "topic": "probability and statistics", "difficulty": "medium", "answer": 0.3125}
+{"id": "q_27", "question": "Compute the distance between points (1,2) and (7,10); round to three decimal places.", "topic": "geometry", "difficulty": "easy", "answer": 10.000}
+{"id": "q_28", "question": "Solve x²-4x+1=0; give the larger root; round to three decimal places.", "topic": "algebra", "difficulty": "medium", "answer": 3.732}
+{"id": "q_29", "question": "A cylinder has volume 144π cm³ and height 9 cm. Compute its radius; round to three decimal places.", "topic": "geometry", "difficulty": "medium", "answer": 4.000}
+{"id": "q_30", "question": "Evaluate (x²-9)/(x²+4x+3) at x=2; round to three decimal places.", "topic": "algebra", "difficulty": "medium", "answer": -0.333}
+{"id": "q_31", "question": "Compute Σ_{k=1}^{20}(2k+1) (integer).", "topic": "sequences and series", "difficulty": "easy", "answer": 440}
+{"id": "q_32", "question": "A triangle has sides 7, 24, 25. Compute its area (integer).", "topic": "geometry", "difficulty": "medium", "answer": 84}
+{"id": "q_33", "question": "Find the determinant of the inverse of [[1,2],[3,4]]; round to three decimal places.", "topic": "linear algebra", "difficulty": "medium", "answer": -0.500}
+{"id": "q_34", "question": "For P(t)=1000e^{0.03t} compute P(10); round to two decimal places.", "topic": "calculus", "difficulty": "medium", "answer": 1349.86}
+{"id": "q_35", "question": "Solve log₅(x)+log₅(x-4)=1; round to three decimal places.", "topic": "exponents and logarithms", "difficulty": "medium", "answer": 5.000}
+{"id": "q_36", "question": "Compute tan(π/4)+sin(π/6); give the exact decimal value.", "topic": "trigonometry", "difficulty": "medium", "answer": 1.5}
+{"id": "q_37", "question": "Find the length of the space diagonal of a rectangular box with dimensions 3×4×5 cm; round to three decimal places.", "topic": "geometry", "difficulty": "medium", "answer": 7.071}
+{"id": "q_38", "question": "Find the coefficient of x³ in the expansion of (2x+1)⁵ (integer).", "topic": "algebra", "difficulty": "easy", "answer": 80}
+{"id": "q_39", "question": "For g(x)=ln(x²+1) compute g'(1); round to three decimal places.", "topic": "calculus", "difficulty": "medium", "answer": 1.000}
+{"id": "q_40", "question": "Solve 4^x=8^{x-1}; give the exact value.", "topic": "exponents and logarithms", "difficulty": "easy", "answer": 3}
+{"id": "q_41", "question": "Evaluate lim_{x→2}(x²-4)/(x-2) (integer).", "topic": "calculus", "difficulty": "easy", "answer": 4}
+{"id": "q_42", "question": "A right triangle has legs 5 and 12. Compute the hypotenuse (integer).", "topic": "geometry", "difficulty": "easy", "answer": 13}
+{"id": "q_43", "question": "Compute the population standard deviation of 2,4,4,4,5,5,7,9; round to three decimal places.", "topic": "statistics", "difficulty": "medium", "answer": 2.000}
+{"id": "q_44", "question": "For the line 3x-4y=12 compute the y-intercept; round to three decimal places.", "topic": "algebra", "difficulty": "easy", "answer": -3.000}
+{"id": "q_45", "question": "Solve 2cos²θ-1=0 on 0°≤θ<360°; give the smallest positive solution (integer degrees).", "topic": "trigonometry", "difficulty": "easy", "answer": 45}
+{"id": "q_46", "question": "Compute 1+2+…+40 (integer).", "topic": "sequences and series", "difficulty": "easy", "answer": 820}
+{"id": "q_47", "question": "A ball's height is h(t)=20t-5t². Compute its maximum height; round to three decimal places.", "topic": "calculus", "difficulty": "medium", "answer": 20.000}
+{"id": "q_48", "question": "Compute lcm(18,24) (integer).", "topic": "number theory", "difficulty": "easy", "answer": 72}
+{"id": "q_49", "question": "Evaluate 5!/(2!3!) (integer).", "topic": "combinatorics", "difficulty": "easy", "answer": 10}
+{"id": "q_50", "question": "A cube has volume 216 cm³. Compute its surface area in cm² (integer).", "topic": "geometry", "difficulty": "medium", "answer": 216}
+{"id": "q_51", "question": "Compute the distance from point (1,2,3) to the plane 2x−y+2z−4=0; round to three decimal places.", "topic": "geometry", "difficulty": "hard", "answer": 0.667}
+{"id": "q_52", "question": "Find the angle in degrees between vectors ⟨1,2,2⟩ and ⟨3,0,4⟩; round to one decimal place.", "topic": "geometry", "difficulty": "medium", "answer": 42.8}
+{"id": "q_53", "question": "Find the antiderivative of xe^{3x} and evaluate it at x=1, given that the antiderivative equals 0 when x=0; round to three decimal places.", "topic": "calculus", "difficulty": "hard", "answer": 4.574}
+{"id": "q_54", "question": "Solve 3^x ≡ 5 (mod 17) for the smallest positive integer x.", "topic": "number theory", "difficulty": "medium", "answer": 5}
+{"id": "q_55", "question": "Compute the rank of the matrix [[1,2,3],[4,5,6],[7,8,9]] (integer).", "topic": "linear algebra", "difficulty": "easy", "answer": 2}
+{"id": "q_56", "question": "Find the exact value of the infinite series Σ_{n=0}^{∞} (-1)^n / 3^n; round to two decimal places.", "topic": "sequences and series", "difficulty": "medium", "answer": 0.75}
+{"id": "q_57", "question": "Compute the determinant of [[2,0,1],[3,1,4],[1,-1,2]] (integer).", "topic": "linear algebra", "difficulty": "easy", "answer": 8}
+{"id": "q_58", "question": "For the cubic equation x³+2x-4=0, compute the real root; round to two decimal places.", "topic": "algebra", "difficulty": "medium", "answer": 1.18}
+{"id": "q_59", "question": "Evaluate ∫₀^{π/2} sin³x dx; round to three decimal places.", "topic": "calculus", "difficulty": "medium", "answer": 0.667}
+{"id": "q_60", "question": "A continuous random variable X has pdf f(x)=2x on [0,1]. Compute E[X]; round to three decimal places.", "topic": "probability and statistics", "difficulty": "medium", "answer": 0.667}
+{"id": "q_61", "question": "Find the remainder when 3^{2024} is divided by 11 (integer from 0–10).", "topic": "number theory", "difficulty": "medium", "answer": 4}
+{"id": "q_62", "question": "A sphere has a radius of 5 cm. Compute its surface area; round to one decimal place using π = 3.14.", "topic": "geometry", "difficulty": "medium", "answer": 314.0}
+{"id": "q_63", "question": "Solve the system x² + y² = 25 and x + y = 7 for y (positive solution); round to three decimal places.", "topic": "algebra", "difficulty": "medium", "answer": 4.000}
+{"id": "q_64", "question": "Find the trace of the matrix [[5,3],[2,7]] (integer).", "topic": "linear algebra", "difficulty": "easy", "answer": 12}
+{"id": "q_65", "question": "Evaluate the limit lim_{x→0} (1-cos x)/x²; round to three decimal places.", "topic": "calculus", "difficulty": "hard", "answer": 0.500}
+{"id": "q_66", "question": "Compute 1/2 + 1/4 + 1/8 + … + 1/2^{15}; round to six decimal places.", "topic": "sequences and series", "difficulty": "medium", "answer": 0.999969}
+{"id": "q_67", "question": "Find the number of edges in a complete bipartite graph K_{5,4} (integer).", "topic": "graph theory", "difficulty": "medium", "answer": 20}
+{"id": "q_68", "question": "Solve 2^{x+1} + 2^{x-1} = 40 for x; round to three decimal places.", "topic": "exponents and logarithms", "difficulty": "medium", "answer": 4.000}
+{"id": "q_69", "question": "Compute the volume of the tetrahedron with vertices (0,0,0), (1,0,0), (0,1,0), (0,0,1); round to three decimal places.", "topic": "geometry", "difficulty": "medium", "answer": 0.167}
+{"id": "q_70", "question": "Evaluate the improper integral ∫_{1}^{∞} 1/x³ dx; round to three decimal places.", "topic": "calculus", "difficulty": "medium", "answer": 0.500}
+{"id": "q_71", "question": "Find the smallest positive integer n such that 1 + 2 + … + n ≥ 1000.", "topic": "sequences and series", "difficulty": "easy", "answer": 45}
+{"id": "q_72", "question": "The line y=2x+3 intersects the circle x²+y²=25 at two points. Compute the x-coordinate of the rightmost intersection; round to three decimal places.", "topic": "geometry", "difficulty": "medium", "answer": 0.954}
+{"id": "q_73", "question": "Compute the magnitude |3-4i| (integer).", "topic": "complex numbers", "difficulty": "easy", "answer": 5}
+{"id": "q_74", "question": "Find the eigenvalue of [[3,1],[0,2]] with larger real part (integer).", "topic": "linear algebra", "difficulty": "easy", "answer": 3}
+{"id": "q_75", "question": "A fair six-sided die is rolled until the first 6 appears. Compute the expected number of rolls; round to three decimal places.", "topic": "probability and statistics", "difficulty": "medium", "answer": 6.000}
+{"id": "q_76", "question": "Evaluate Σ_{k=1}^{10} k² (integer).", "topic": "sequences and series", "difficulty": "easy", "answer": 385}
+{"id": "q_77", "question": "Compute the greatest common divisor of 1001 and 1547 (integer).", "topic": "number theory", "difficulty": "easy", "answer": 91}
+{"id": "q_78", "question": "Find the area enclosed by y=x² and y=4; round to one decimal place.", "topic": "calculus", "difficulty": "medium", "answer": 10.7}
+{"id": "q_79", "question": "Solve the differential equation dy/dx = 3y with y(0)=2 at x=1; round to three decimal places.", "topic": "calculus", "difficulty": "medium", "answer": 40.171}
+{"id": "q_80", "question": "Compute the number of 3-letter strings with distinct letters chosen from {A,B,C,D,E} (integer).", "topic": "combinatorics", "difficulty": "easy", "answer": 60}
+{"id": "q_81", "question": "For f(n)=n⁴, evaluate the 5th finite difference Δ⁵f(0) (integer).", "topic": "discrete mathematics", "difficulty": "medium", "answer": 0}
+{"id": "q_82", "question": "Compute the exact value of Σ_{k=1}^{∞} 1/[k(k+1)(k+2)]; round to two decimal places.", "topic": "sequences and series", "difficulty": "medium", "answer": 0.25}
+{"id": "q_83", "question": "Find the smallest positive integer x such that 2x ≡ 3 (mod 11).", "topic": "number theory", "difficulty": "easy", "answer": 7}
+{"id": "q_84", "question": "Evaluate the line integral ∫_C (x+y) ds along the straight segment from (0,0) to (1,1); round to three decimal places.", "topic": "calculus", "difficulty": "medium", "answer": 1.414}
+{"id": "q_85", "question": "Compute the median of the data set 3, 7, 8, 5, 12, 14, 21, 13, 18 (integer).", "topic": "statistics", "difficulty": "easy", "answer": 12}
+{"id": "q_86", "question": "Find the exact value of sin(75°); round to four decimal places.", "topic": "trigonometry", "difficulty": "medium", "answer": 0.9659}
+{"id": "q_87", "question": "A box contains 4 red and 6 blue marbles. Two marbles are drawn without replacement; compute the probability both are red; round to four decimal places.", "topic": "probability and statistics", "difficulty": "medium", "answer": 0.1333}
+{"id": "q_88", "question": "Compute the area of the triangle with vertices (0,0), (5,1), (3,4); round to one decimal place.", "topic": "geometry", "difficulty": "medium", "answer": 8.5}
+{"id": "q_89", "question": "Evaluate the infinite product ∏_{k=2}^{∞} (1−1/k²); round to six decimal places.", "topic": "sequences and series", "difficulty": "hard", "answer": 0.500000}
+{"id": "q_90", "question": "Find the 2024th digit after the decimal point in the decimal expansion of 1/7 (integer from 0–9).", "topic": "number theory", "difficulty": "medium", "answer": 4}
+{"id": "q_91", "question": "Compute the dot product of ⟨2, −3, 1⟩ and ⟨4, 0, 5⟩ (integer).", "topic": "geometry", "difficulty": "easy", "answer": 13}
+{"id": "q_92", "question": "Solve 4^x − 2^{x+1} − 8 = 0 for x; round to three decimal places.", "topic": "exponents and logarithms", "difficulty": "medium", "answer": 2.000}
+{"id": "q_93", "question": "Evaluate the definite integral ∫_{0}^{π/4} tan x dx; round to three decimal places.", "topic": "calculus", "difficulty": "medium", "answer": 0.347}
+{"id": "q_94", "question": "Compute the number of diagonals in a regular decagon (integer).", "topic": "geometry", "difficulty": "easy", "answer": 35}
+{"id": "q_95", "question": "Find the radius of the circle x² + y² − 4x + 6y − 12 = 0; round to three decimal places.", "topic": "geometry", "difficulty": "medium", "answer": 5.000}
+{"id": "q_96", "question": "Evaluate the 2024th Fibonacci number modulo 1000 (integer from 0–999).", "topic": "number theory", "difficulty": "medium", "answer": 493}
+{"id": "q_97", "question": "Compute the sample standard deviation of 10, 12, 14, 16, 18; round to two decimal places.", "topic": "statistics", "difficulty": "medium", "answer": 3.16}
+{"id": "q_98", "question": "Find the exact value of log₂(128) (integer).", "topic": "exponents and logarithms", "difficulty": "easy", "answer": 7}
+{"id": "q_99", "question": "A regular tetrahedron has edge length 6 cm. Compute its volume; round to three decimal places.", "topic": "geometry", "difficulty": "medium", "answer": 25.456}
+{"id": "q_100", "question": "Compute the sum of the geometric series 5 + 5/3 + 5/9 + … to infinity; round to three decimal places.", "topic": "sequences and series", "difficulty": "medium", "answer": 7.500}

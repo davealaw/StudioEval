@@ -1,0 +1,99 @@
+[
+  {
+    "eval_type": "grammar",
+    "dataset_path": "eval_datasets/custom/data/grammar_dataset.jsonl",
+    "dataset_name": "grammar",
+    "split": null,
+    "seed": null,
+    "sample_size": null
+  },
+  {
+    "eval_type": "custom_mcq",
+    "dataset_path": "eval_datasets/custom/data/creative_writing_mcq_dataset.jsonl",
+    "dataset_name": "creative_writing",
+    "split": null,
+    "seed": null,
+    "sample_size": null
+  },
+  {
+    "eval_type": "custom_mcq",
+    "dataset_path": "eval_datasets/custom/data/data_analysis_mcq_dataset.jsonl",
+    "dataset_name": "data_analysis_mcq",
+    "subset": null,
+    "split": null,
+    "seed": null,
+    "sample_size": null
+  },  
+  {
+    "eval_type": "custom_mcq",
+    "dataset_path": "eval_datasets/custom/data/coding_mcq_dataset.jsonl",
+    "dataset_name": "coding_mcq",
+    "split": null,
+    "seed": null,
+    "sample_size": null
+  },
+  {
+    "eval_type": "math",
+    "dataset_path": "eval_datasets/custom/data/elementary_math_dataset.jsonl",
+    "dataset_name": "elementary_math",
+    "split": null,
+    "seed": null,
+    "sample_size": null
+  },
+  {
+    "eval_type": "math",
+    "dataset_path": "eval_datasets/custom/data/hs_lower_university_math_dataset.jsonl",
+    "dataset_name": "hs_math",
+    "split": null,
+    "seed": null,
+    "sample_size": null
+  },
+  {
+    "eval_type": "gsm8k",
+    "dataset_path": "tinyBenchmarks/tinyGSM8k",
+    "dataset_name": "tinyGSM8k",
+    "split": null,
+    "seed": null,
+    "sample_size": null
+  },
+  {
+    "eval_type": "arc",
+    "dataset_path": "tinyBenchmarks/tinyAI2_arc",
+    "dataset_name": "tinyARC",
+    "split": null,
+    "seed": null,
+    "sample_size": null
+  },
+  {
+    "eval_type": "mmlu",
+    "dataset_path": "tinyBenchmarks/tinyMMLU",
+    "dataset_name": "tinyMMLU",
+    "split": null,
+    "seed": null,
+    "sample_size": null
+  },
+  {
+    "eval_type": "commonsenseqa",
+    "dataset_path": "tau/commonsense_qa",
+    "dataset_name": "commonsenseqa",
+    "split": null,
+    "seed": null,
+    "sample_size": null
+  },
+  {
+    "eval_type": "logiqa",
+    "dataset_path": "lucasmccabe/logiqa",
+    "dataset_name": "logiqa",
+    "split": null,
+    "seed": null,
+    "sample_size": null
+  },
+  {
+    "eval_type": "truthfulqa",
+    "dataset_path": "tinyBenchmarks/tinyTruthfulQA",
+    "dataset_name": "tinyTruthfulQA",
+    "split": null,
+    "seed": null,
+    "sample_size": null
+  }
+]
