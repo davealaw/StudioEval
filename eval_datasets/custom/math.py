@@ -7,7 +7,7 @@ from models.model_handling import query_model
 
 logger = logging.getLogger(__name__)
 
-def evaluate_math_dataset(model_id, jsonl_path="elementary_math_dataset.jsonl", dataset_name="basic math", seed=42, sample_size=0, **kwargs):
+def evaluate_math_dataset(model_id, jsonl_path="elementary_math_dataset.jsonl", dataset_name="basic math", seed=42, sample_size=0, sleep=True, **kwargs):
     """
     Evaluate a custom exact answer math dataset with the model. 
 
@@ -17,6 +17,7 @@ def evaluate_math_dataset(model_id, jsonl_path="elementary_math_dataset.jsonl", 
         dataset_name (str): Name of the dataset for logging.
         seed (int): Random seed for reproducibility.
         sample_size (int): Number of samples to evaluate, 0 means all.
+        sleep (bool): Whether to include sleep delay between items (default True).
         **kwargs: Additional keyword arguments.
     
     Returns:
@@ -75,7 +76,8 @@ def evaluate_math_dataset(model_id, jsonl_path="elementary_math_dataset.jsonl", 
             correct += 1
         total += 1
 
-        time.sleep(0.1)
+        if sleep:
+            time.sleep(0.1)
 
     return {
         "dataset": dataset_name,

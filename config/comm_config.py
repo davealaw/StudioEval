@@ -23,13 +23,6 @@ def _validate(cfg: Dict[str, Any]) -> Dict[str, Any]:
     """Validate and coerce types; fallback to defaults with warnings when invalid."""
     out = deepcopy(DEFAULT_CONFIG)
 
-    # LMSTUDIO_URL
-    url = cfg.get("LMSTUDIO_URL", out["LMSTUDIO_URL"])
-    if not isinstance(url, str) or not url.strip():
-        logger.warning("Invalid LMSTUDIO_URL in comm config; using default.")
-    else:
-        out["LMSTUDIO_URL"] = url.strip()
-
     # timeout
     timeout = cfg.get("timeout", out["timeout"])
     if not isinstance(timeout, int) and not isinstance(timeout, float):
@@ -89,4 +82,4 @@ def load_comm_config(path: str) -> None:
 
 def get_comm_config() -> Dict[str, Any]:
     """Return the effective, validated config (defaults if not loaded)."""
-    return _config
+    return deepcopy(_config)

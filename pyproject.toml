@@ -1,19 +1,77 @@
 [project]
 name = "studioeval"
-version = "0.1.0"
+dynamic = ["version"]
 description = "Lightweight LLM evaluation framework using LM Studio as the inference backend"
 authors = [{ name = "Dave Law" }]
 license = "MIT"
 readme = "README.md"
 requires-python = ">=3.9"
 
+[project.scripts]
+studioeval = "studioeval:main"
+
 dependencies = [
-    "requests",
-    "datasets",
-    "tqdm",
-    "numpy",
-    "scikit-learn"
+    "requests>=2.25.0",
+    "datasets>=2.0.0",
+    "tqdm>=4.60.0",
+    "numpy>=1.20.0",
+    "scikit-learn>=1.0.0"
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "pytest-mock>=3.10.0",
+    "hypothesis>=6.0.0",
+]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "pytest-mock>=3.10.0",
+    "hypothesis>=6.0.0",
 ]
 
 [tool.setuptools]
-packages = ["studioeval", "eval_datasets", "models", "utils", "config"]
+packages = ["eval_datasets", "models", "utils", "config", "core", "interfaces", "implementations"]
+
+[tool.setuptools.dynamic]
+version = {attr = "__version__.__version__"}
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_functions = ["test_*"]
+addopts = [
+    "--cov=.",
+    "--cov-report=html",
+    "--cov-report=term-missing",
+    "--strict-markers",
+    "--disable-warnings",
+]
+markers = [
+    "unit: Unit tests",
+    "integration: Integration tests",
+    "e2e: End-to-end tests",
+    "slow: Slow running tests",
+    "lmstudio: Tests requiring LM Studio",
+]
+
+[tool.coverage.run]
+source = ["."]
+omit = [
+    "tests/*",
+    "_archive/*",
+    "*/test_*",
+    "*/__pycache__/*",
+    "**/_archive/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+]

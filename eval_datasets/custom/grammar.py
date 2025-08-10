@@ -7,7 +7,7 @@ from utils.text_parsing import extract_corrected_text, normalize
 
 logger = logging.getLogger(__name__)
 
-def evaluate_grammar_dataset(model_id, jsonl_path="grammar_dataset.jsonl", dataset_name="grammar", seed=42, sample_size=0, **kwargs):
+def evaluate_grammar_dataset(model_id, jsonl_path="grammar_dataset.jsonl", dataset_name="grammar", seed=42, sample_size=0, sleep=True, **kwargs):
     """
     Evaluate a custom grammar correction dataset using a language model.
     
@@ -60,7 +60,8 @@ def evaluate_grammar_dataset(model_id, jsonl_path="grammar_dataset.jsonl", datas
             correct += 1
         total += 1
 
-        time.sleep(0.1)
+        if sleep:
+            time.sleep(0.1)
 
     return {
         "dataset": dataset_name,

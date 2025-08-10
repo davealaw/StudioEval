@@ -7,7 +7,7 @@ from utils.text_parsing import extract_letter
 
 logger = logging.getLogger(__name__)
 
-def evaluate_cumstom_mcq(model_id, jsonl_path="coding_mcq_dataset.jsonl", dataset_name="coding_mcq", seed=42, sample_size=0, **kwargs):
+def evaluate_cumstom_mcq(model_id, jsonl_path="coding_mcq_dataset.jsonl", dataset_name="coding_mcq", seed=42, sample_size=0, sleep=True, **kwargs):
     """
     Evaluate a custom multiple-choice question dataset using a language model.
     
@@ -63,7 +63,9 @@ def evaluate_cumstom_mcq(model_id, jsonl_path="coding_mcq_dataset.jsonl", datase
         if is_correct:
             correct += 1
         total += 1
-        time.sleep(0.1)
+
+        if sleep:
+            time.sleep(0.1)
 
     return {
         "dataset": dataset_name,
