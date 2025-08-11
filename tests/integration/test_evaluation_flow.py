@@ -66,13 +66,6 @@ class TestModelManager:
         with pytest.raises(ValueError, match="Must specify model selection criteria"):
             model_manager.resolve_models()
             
-    def test_should_skip_thinking_models(self, model_manager):
-        """Test thinking model skip logic."""
-        assert model_manager.should_skip_model("qwq-model", skip_thinking_models=True)
-        assert model_manager.should_skip_model("glm-model", skip_thinking_models=True)
-        assert not model_manager.should_skip_model("normal-model", skip_thinking_models=True)
-        assert not model_manager.should_skip_model("qwq-model", skip_thinking_models=False)
-
 
 class TestDatasetRegistry:
     """Test DatasetRegistry functionality."""

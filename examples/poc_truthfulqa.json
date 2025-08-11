@@ -1,0 +1,11 @@
+[
+  {
+    "eval_type": "truthfulqa",
+    "dataset_path": "TruthfulQA",
+    "dataset_name": "tinyTruthfulQA",
+    "subset": "multiple_choice",    
+    "split": "validation",
+    "seed": 42,
+    "sample_size": 10
+  }
+]

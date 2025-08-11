@@ -1,0 +1,42 @@
+[
+  {
+    "eval_type": "grammar",
+    "dataset_path": "eval_datasets/custom/data/grammar_dataset.jsonl",
+    "dataset_name": "grammar",
+    "split": null,
+    "seed": null,
+    "sample_size": null
+  },
+  {
+    "eval_type": "math",
+    "dataset_path": "eval_datasets/custom/data/elementary_math_dataset.jsonl",
+    "dataset_name": "elementary_math",
+    "split": null,
+    "seed": null,
+    "sample_size": null
+  },
+  {
+    "eval_type": "commonsenseqa",
+    "dataset_path": "tau/commonsense_qa",
+    "dataset_name": "commonsenseqa",
+    "split": null,
+    "seed": null,
+    "sample_size": null
+  },
+  {
+    "eval_type": "logiqa",
+    "dataset_path": "lucasmccabe/logiqa",
+    "dataset_name": "logiqa",
+    "split": null,
+    "seed": null,
+    "sample_size": null
+  },
+  {
+    "eval_type": "truthfulqa",
+    "dataset_path": "tinyBenchmarks/tinyTruthfulQA",
+    "dataset_name": "tinyTruthfulQA",
+    "split": null,
+    "seed": null,
+    "sample_size": null
+  }
+]

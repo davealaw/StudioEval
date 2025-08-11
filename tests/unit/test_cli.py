@@ -145,23 +145,6 @@ class TestCLIArgumentParsing:
                         # Verify comm config loading was called
                         mock_load_config.assert_called_once_with('comm.json')
     
-    def test_skip_thinking_models_argument(self):
-        """Test skip thinking models argument."""
-        test_args = ['--skip', '--model', 'test']
-        
-        with patch('sys.argv', ['studioeval.py'] + test_args):
-            with patch('core.evaluator.EvaluationOrchestrator') as mock_orchestrator:
-                with patch.object(studioeval, 'setup_logging'):
-                    mock_instance = Mock()
-                    mock_instance.run_evaluation.return_value = True
-                    mock_orchestrator.return_value = mock_instance
-                    
-                    studioeval.main()
-                    
-                    call_kwargs = mock_instance.run_evaluation.call_args[1]
-                    assert call_kwargs['skip_thinking_models'] is True
-
-
 class TestCLIExplicitArgumentDetection:
     """Test CLI explicit argument detection logic."""
     
@@ -321,7 +304,6 @@ class TestCLIIntegration:
             '--sample-size', '50',
             '--seed', '123',
             '--log-level', 'DEBUG',
-            '--skip',
             '--raw-duration'
         ]
         
@@ -340,12 +322,11 @@ class TestCLIIntegration:
                     assert call_kwargs['datasets_config'] == 'datasets.json'
                     assert call_kwargs['sample_size'] == 50
                     assert call_kwargs['seed'] == 123
-                    assert call_kwargs['skip_thinking_models'] is True
                     assert call_kwargs['raw_duration'] is True
                     
                     # Verify explicit args detection
                     explicit_args = call_kwargs['cli_explicit_args']
-                    expected_explicit = {'model', 'datasets_config', 'sample_size', 'seed', 'skip', 'raw_duration'}
+                    expected_explicit = {'model', 'datasets_config', 'sample_size', 'seed', 'raw_duration'}
                     assert expected_explicit.issubset(explicit_args)
                     
                     # Verify logging setup
@@ -369,7 +350,6 @@ class TestCLIIntegration:
                     assert call_kwargs['model'] is None
                     assert call_kwargs['sample_size'] == 0  # Default
                     assert call_kwargs['seed'] == 42  # Default
-                    assert call_kwargs['skip_thinking_models'] is False
                     assert call_kwargs['raw_duration'] is False
                     
                     # Verify no explicit args

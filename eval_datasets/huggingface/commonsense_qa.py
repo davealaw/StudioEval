@@ -41,6 +41,12 @@ def evaluate_commonsense_qa(model_id, dataset_path="tau/commonsense_qa", dataset
             continue
 
         question = item["question"].strip()
+        
+        # Check if choices exists and is properly formatted
+        if "choices" not in item:
+            skipped += 1
+            continue
+            
         choices = item["choices"]
         
         if isinstance(choices, dict) and "label" in choices and "text" in choices:

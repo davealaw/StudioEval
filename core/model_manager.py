@@ -87,29 +87,7 @@ class ModelManager:
             return available
             
         raise ValueError("Must specify model selection criteria")
-    
-    def should_skip_model(self, model_id: str, skip_thinking_models: bool = False) -> bool:
-        """
-        Determine if a model should be skipped based on skip criteria.
         
-        Args:
-            model_id: The model identifier
-            skip_thinking_models: Whether to skip known thinking models
-            
-        Returns:
-            True if model should be skipped
-        """
-        if not skip_thinking_models:
-            return False
-            
-        skip_prefixes = (
-            "glm", "kimi-dev", "qwq", "qwen/qwen3", "qwen3-128k", 
-            "openthinker2", "openai", "xbai", "mradermacher/xbai-o4", 
-            "mlx-community/xbai-o4", "gpt"
-        )
-        
-        return any(model_id.startswith(prefix) for prefix in skip_prefixes)
-    
     def load_model(self, model_id: str) -> None:
         """Load a model."""
         self.client.load_model(model_id)

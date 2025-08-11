@@ -101,17 +101,58 @@ python studioeval.py --model-filter "llama*" --sample-size 50
 ## 📋 Supported Datasets
 
 ### 🤗 Hugging Face Datasets
-- **ARC** (AI2 Reasoning Challenge) - Science reasoning
-- **GSM8K** - Grade school math word problems  
-- **MMLU** (Massive Multitask Language Understanding) - Knowledge across 57 subjects
+- **ARC** (AI2 Reasoning Challenge) - Science reasoning (Default tinyArc)
+- **GSM8K** - Grade school math word problems   (Default tinyGSM8K)
+- **MMLU** (Massive Multitask Language Understanding) - Knowledge across 57 subjects (Default tinyMMLU)
+- **TruthfulQA** - Truthfulness evaluation - Single Answer (Default tinyTruthfulQA)
 - **CommonSenseQA** - Commonsense reasoning
 - **LogiQA** - Logical reasoning
-- **TruthfulQA** - Truthfulness evaluation
 
 ### 🎯 Custom Datasets
-- **Grammar** - Grammar correction and validation
-- **Math** - Elementary and high school mathematics
-- **Custom MCQ** - Multiple choice questions for various domains
+- **Grammar** - Grammar correction and validation (Exact sentence answer - 100 Questions)
+- **Math** - Separate Elementary and high school mathematics (Exact numeric answer - 100 Questions each)
+- **Custom MCQ** - Multiple choice questions for various domains - Proof of Concept Examples
+  - ***Creative Writing*** - Writing Mechanics and editing (120 Questions)
+  - ***Coding*** - Realistic high technical cross topics (110 Questions)
+  - ***Data Analysis*** - Comprehensive data analysis topics (135 Questions)
+
+#### 📝 Adding Your Own Custom MCQ Dataset
+
+StudioEval supports custom Multiple Choice Question (MCQ) datasets in JSONL format. You can easily drop in your own dataset by following the required format and configuration steps.
+
+**Required JSONL Format:**
+Each line in your `.jsonl` file must be a valid JSON object with these required fields:
+
+```json
+{"id": "q_001", "question": "Your question text here?", "choices": {"A": "First option", "B": "Second option", "C": "Third option", "D": "Fourth option"}, "answer": "B", "difficulty": "medium"}
+```
+
+**Required Fields:**
+- `id`: Unique identifier for the question (string)
+- `question`: The question text (string)
+- `choices`: Object with exactly 4 options labeled "A", "B", "C", "D" (object)
+- `answer`: The correct answer letter - must be one of "A", "B", "C", or "D" (string)
+- `difficulty`: Question difficulty level - "easy", "medium", or "hard" (string)
+
+**Setup Steps:**
+1. Create your JSONL file following the format above
+2. Place it in `eval_datasets/custom/data/`
+3. Add configuration to your dataset config JSON:
+
+```json
+{
+  "eval_type": "custom_mcq",
+  "dataset_path": "eval_datasets/custom/data/your_dataset.jsonl", 
+  "dataset_name": "your_dataset_name",
+  "sample_size": null
+}
+```
+
+**Example Usage:**
+```bash
+# Evaluate using your custom MCQ dataset
+python studioeval.py --model "your-model" --datasets-config your_custom_config.json
+```
 
 ## ⚙️ Configuration
 
@@ -164,7 +205,6 @@ Configure LM Studio communication parameters:
 --model-arch ARCH            # Architecture filter (e.g., 'qwen*')
 --model-set FILE             # File with model IDs (one per line)
 --all                        # Evaluate all loaded models
---skip                       # Skip thinking/reasoning models
 ```
 
 ### Evaluation Control

@@ -219,23 +219,6 @@ class TestCLIModelSelectionWorkflows:
         assert "--model-filter" in result.stdout
         assert "--model MODEL" in result.stdout
     
-    def test_cli_skip_thinking_models(self):
-        """Test CLI with skip thinking models flag."""
-        # Test that --skip flag is recognized in help
-        
-        result = subprocess.run([
-            "python3", "studioeval.py", 
-            "--all", 
-            "--skip",
-            "--help"
-        ], capture_output=True, text=True, cwd=".")
-        
-        # Help should work and show both flags
-        assert result.returncode == 0
-        assert "usage:" in result.stdout.lower()
-        assert "--skip" in result.stdout
-        assert "--all" in result.stdout
-
 
 class TestCLIOutputWorkflows:
     """Test CLI output and result handling workflows."""
@@ -400,7 +383,7 @@ class TestCLIIntegrationScenarios:
             "--comm-config", realistic_test_setup["config_file"],
             "--datasets-config", realistic_test_setup["datasets_file"],
             "--model-filter", "qwen*",
-            "--skip", "--help"
+            "--help"
         ], capture_output=True, text=True, cwd=".")
         
         # Help should work with complex arguments
@@ -414,14 +397,13 @@ class TestCLIIntegrationScenarios:
         result = subprocess.run([
             "python3", "studioeval.py",
             "--all",
-            "--skip", "--help"
+            "--help"
         ], capture_output=True, text=True, cwd=".")
         
         # Help should work with batch arguments
         assert result.returncode == 0
         assert "usage:" in result.stdout.lower()
         assert "--all" in result.stdout
-        assert "--skip" in result.stdout
     
     def test_cli_argument_validation_workflow(self):
         """Test that CLI properly validates argument combinations."""

@@ -41,7 +41,6 @@ class EvaluationOrchestrator:
                       model_arch: str = None,
                       all_models: bool = False,
                       datasets_config: str = None,
-                      skip_thinking_models: bool = False,
                       sample_size: int = 0,
                       seed: int = 42,
                       raw_duration: bool = False,
@@ -58,7 +57,6 @@ class EvaluationOrchestrator:
             model_arch: Architecture pattern filter
             all_models: Evaluate all available models
             datasets_config: Path to datasets configuration file
-            skip_thinking_models: Skip known thinking models
             sample_size: Number of samples per dataset (0 for all)
             seed: Random seed for reproducibility
             raw_duration: Output raw seconds vs human-readable duration
@@ -101,14 +99,11 @@ class EvaluationOrchestrator:
             logger.error(str(e))
             return False
         
-        # logger.info("-" * 41 + "\n")
-        
         # Evaluate each model
         for model_id in resolved_models:
             self._evaluate_single_model(
                 model_id=model_id,
                 datasets_config=datasets_config,
-                skip_thinking_models=skip_thinking_models,
                 sample_size=sample_size,
                 seed=seed,
                 raw_duration=raw_duration,
@@ -121,7 +116,6 @@ class EvaluationOrchestrator:
     def _evaluate_single_model(self, 
                               model_id: str,
                               datasets_config: str = None,
-                              skip_thinking_models: bool = False,
                               sample_size: int = 0,
                               seed: int = 42,
                               raw_duration: bool = False,
@@ -133,7 +127,6 @@ class EvaluationOrchestrator:
         Args:
             model_id: Model identifier
             datasets_config: Path to datasets configuration
-            skip_thinking_models: Skip known thinking models
             sample_size: Number of samples per dataset
             seed: Random seed
             raw_duration: Output format for duration
@@ -142,10 +135,6 @@ class EvaluationOrchestrator:
         """
         logger.info(f"--- Evaluating {model_id} ---")
         
-        # Check if model should be skipped
-        if self.model_manager.should_skip_model(model_id, skip_thinking_models):
-            logger.info(f"Skipping {model_id} as it is a thinking model.")
-            return
         
         # Load model
         self.model_manager.load_model(model_id)

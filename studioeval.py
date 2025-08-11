@@ -16,7 +16,6 @@ def main():
     parser.add_argument("--model-arch", dest="model_arch", default=None, help="Glob-style architecture filter of models, e.g. 'qwen3' or 'qwen*'")
     parser.add_argument("--all", action="store_true", help="Test all loaded models")
     parser.add_argument("--datasets-config", type=str, help="Path to datasets_to_run JSON file")
-    parser.add_argument("--skip", action="store_true", help="Skip models that are thinking models or not LLMs")
     parser.add_argument("--sample-size", type=int, default=0, help="Number of samples to evaluate from each dataset (0 for all)")
     parser.add_argument("--seed", type=int, default=42, help="Random seed for reproducibility")
     parser.add_argument("--log-level", default="INFO", help="Set log level (DEBUG, INFO, WARNING, ERROR)")
@@ -53,7 +52,6 @@ def main():
         model_arch=args.model_arch,
         all_models=args.all,
         datasets_config=args.datasets_config,
-        skip_thinking_models=args.skip,
         sample_size=args.sample_size,
         seed=args.seed,
         raw_duration=args.raw_duration,

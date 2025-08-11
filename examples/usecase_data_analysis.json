@@ -1,0 +1,43 @@
+[
+  {
+    "eval_type": "custom_mcq",
+    "dataset_path": "eval_datasets/custom/data/data_analysis_mcq_dataset.jsonl",
+    "dataset_name": "data_analysis_mcq",
+    "subset": null,
+    "split": null,
+    "seed": null,
+    "sample_size": null
+  },  
+  {
+    "eval_type": "custom_mcq",
+    "dataset_path": "eval_datasets/custom/data/coding_mcq_dataset.jsonl",
+    "dataset_name": "coding_mcq",
+    "split": null,
+    "seed": null,
+    "sample_size": null
+  },
+  {
+    "eval_type": "math",
+    "dataset_path": "eval_datasets/custom/data/elementary_math_dataset.jsonl",
+    "dataset_name": "elementary_math",
+    "split": null,
+    "seed": null,
+    "sample_size": null
+  },
+  {
+    "eval_type": "math",
+    "dataset_path": "eval_datasets/custom/data/hs_lower_university_math_dataset.jsonl",
+    "dataset_name": "hs_math",
+    "split": null,
+    "seed": null,
+    "sample_size": null
+  },
+  {
+    "eval_type": "gsm8k",
+    "dataset_path": "tinyBenchmarks/tinyGSM8k",
+    "dataset_name": "tinyGSM8k",
+    "split": null,
+    "seed": null,
+    "sample_size": null
+  }
+]
