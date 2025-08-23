@@ -91,6 +91,49 @@ def normalize(text: str) -> str:
     text = text.replace("\u00A0", " ")
     return text.strip().lower()
 
+END_SENTINELS_RX = re.compile(r'(?:</s>|<\|endoftext\|>|<\|im_end\|>|<\|end\|>|<\|endofresponse\|>)\s*$', re.I)
+THINK_BLOCK_RX   = re.compile(r'<\s*(think|analysis|reasoning)\b[^>]*>.*?<\s*/\s*\1\s*>', re.I|re.S)
+ANSWER_RX        = re.compile(r'^\s*<\s*(answer|final)\b[^>]*>(.*?)<\s*/\s*\1\s*>\s*$', re.I|re.S)
+CHATML_WRAP_RX   = re.compile(r'^\s*<\|im_start\|>\s*assistant\s*(.*?)\s*<\|im_end\|>\s*$', re.I|re.S)
+CODE_FENCE_RX    = re.compile(r'^\s*```[\w-]*\s*\n(.*?)\n```?\s*$', re.S)
+
+KNOWN_OPENERS = ('<think', '<analysis', '<reasoning', '<answer', '<final', '<|im_start|>', '```', 'assistant:', '### response:')
+
+def clean_llm_output(s: str) -> str:
+    """
+    Attempts to remove any text before and after the expected LLM output 
+    to help avoid false negative checks
+
+    Args:
+        text (str): The model output text
+    Returns:
+        text (str): Stripped output text
+    """
+    if not s: 
+        return s
+    # Cheap trailing cleanup first
+    s = END_SENTINELS_RX.sub('', s)
+    head = s.lstrip()[:80].lower()
+    if not any(k in head for k in KNOWN_OPENERS) and '<' not in head:
+        return s.strip()
+
+    # Targeted passes
+    s = THINK_BLOCK_RX.sub('', s)
+
+    m = ANSWER_RX.match(s)
+    if m:
+        s = m.group(2)
+
+    m = CHATML_WRAP_RX.match(s)
+    if m:
+        s = m.group(1)
+
+    m = CODE_FENCE_RX.match(s)
+    if m:
+        s = m.group(1)
+
+    return END_SENTINELS_RX.sub('', s).strip()
+
 def extract_numeric_answer(text: str) -> Optional[float]:
     """
     Extracts a numeric answer from model output.

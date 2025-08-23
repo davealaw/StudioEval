@@ -3,7 +3,7 @@ import logging
 from tqdm import tqdm
 from models.model_handling import query_model
 from utils.data_loading import load_json_dataset_with_config
-from utils.text_parsing import extract_corrected_text, normalize
+from utils.text_parsing import extract_corrected_text, normalize, clean_llm_output
 
 logger = logging.getLogger(__name__)
 
@@ -50,6 +50,8 @@ def evaluate_grammar_dataset(model_id, jsonl_path="grammar_dataset.jsonl", datas
         model_output = model_output.strip()
         tokens_per_second_total += stats["tokens_per_second"]
 
+        model_output = clean_llm_output(model_output)
+        logger.debug(f"Model Output: {model_output}")
 
         # Gather results
         predicted = extract_corrected_text(model_output).strip()
