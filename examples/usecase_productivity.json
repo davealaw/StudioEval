@@ -1,5 +1,14 @@
 [
   {
+    "eval_type": "custom_mcq",
+    "dataset_path": "eval_datasets/custom/data/productivity_mcq_dataset.jsonl",
+    "dataset_name": "productivity_mcq",
+    "subset": null,
+    "split": null,
+    "seed": null,
+    "sample_size": null
+  },  
+  {
     "eval_type": "grammar",
     "dataset_path": "eval_datasets/custom/data/grammar_dataset.jsonl",
     "dataset_name": "grammar",
