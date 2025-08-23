@@ -14,7 +14,7 @@ from eval_datasets.huggingface.gsm8k import evaluate_gsm8k_dataset
 from eval_datasets.huggingface.truthfulqa import evaluate_tiny_truthfulqa, extract_mc1_fields, prepare_mc1_item
 from eval_datasets.huggingface.commonsense_qa import evaluate_commonsense_qa
 from eval_datasets.huggingface.logiqa import evaluate_logiqa
-from eval_datasets.custom.custom_mcq import evaluate_cumstom_mcq
+from eval_datasets.custom.custom_mcq import evaluate_custom_mcq
 from eval_datasets.custom.grammar import evaluate_grammar_dataset
 from eval_datasets.custom.math import evaluate_math_dataset
 
@@ -132,7 +132,7 @@ class TestCustomMCQEvaluator:
         mock_load.return_value = mock_dataset
         mock_query.return_value = ("Answer: B", {"tokens_per_second": 8.0})
         
-        result = evaluate_cumstom_mcq("test_model", "test.jsonl")
+        result = evaluate_custom_mcq("test_model", "test.jsonl")
         
         assert result["dataset"] == "coding_mcq"  # Default name
         assert result["total"] == 1
@@ -147,7 +147,7 @@ class TestCustomMCQEvaluator:
         """Test custom MCQ evaluation when dataset loading fails."""
         mock_load.return_value = None
         
-        result = evaluate_cumstom_mcq("test_model", "bad.jsonl")
+        result = evaluate_custom_mcq("test_model", "bad.jsonl")
         
         assert result is None
     
@@ -172,7 +172,7 @@ class TestCustomMCQEvaluator:
         mock_load.return_value = mock_dataset
         mock_query.return_value = ("Answer: A", {"tokens_per_second": 5.0})
         
-        result = evaluate_cumstom_mcq("test_model", "test.jsonl")
+        result = evaluate_custom_mcq("test_model", "test.jsonl")
         
         assert result["total"] == 1  # Only 1 valid item
         assert result["skipped"] == 4  # 4 invalid items
@@ -346,7 +346,7 @@ class TestEvaluatorCommonPatterns:
         with patch('eval_datasets.custom.custom_mcq.load_json_dataset_with_config') as mock_load:
             mock_load.return_value = []
             
-            evaluate_cumstom_mcq("model", "test.jsonl", sample_size=10)
+            evaluate_custom_mcq("model", "test.jsonl", sample_size=10)
             
             mock_load.assert_called_once_with("test.jsonl", seed=42, sample_size=10)
     
@@ -381,7 +381,7 @@ class TestEvaluatorErrorHandling:
         
         # The evaluator should let the exception propagate
         with pytest.raises(RuntimeError, match="Model query failed"):
-            evaluate_cumstom_mcq("test_model", "test.jsonl")
+            evaluate_custom_mcq("test_model", "test.jsonl")
     
     def test_evaluators_handle_empty_datasets(self):
         """Test evaluator behavior with empty datasets."""
