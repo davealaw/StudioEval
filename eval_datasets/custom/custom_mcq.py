@@ -7,7 +7,7 @@ from utils.text_parsing import extract_letter
 
 logger = logging.getLogger(__name__)
 
-def evaluate_cumstom_mcq(model_id, jsonl_path="coding_mcq_dataset.jsonl", dataset_name="coding_mcq", seed=42, sample_size=0, sleep=True, **kwargs):
+def evaluate_custom_mcq(model_id, jsonl_path="coding_mcq_dataset.jsonl", dataset_name="coding_mcq", seed=42, sample_size=0, sleep=True, **kwargs):
     """
     Evaluate a custom multiple-choice question dataset using a language model.
     
@@ -59,6 +59,10 @@ def evaluate_cumstom_mcq(model_id, jsonl_path="coding_mcq_dataset.jsonl", datase
         predicted = extract_letter(model_output)
         is_correct = predicted == expected
         logger.debug(f"✅ Question {total + 1} - Expected: {expected}, Predicted: {predicted} - {'Correct' if is_correct else 'Incorrect'}")
+
+        if not is_correct:
+            logger.debug(f"📤 Prompt sent to model (question {total + 1}):\n{full_prompt}\n")
+            logger.debug(f"❌ Incorrect answer for question '{question}': expected {expected}, got {predicted}")
 
         if is_correct:
             correct += 1

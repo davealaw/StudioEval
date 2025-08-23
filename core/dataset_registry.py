@@ -4,7 +4,7 @@ Dataset registry for managing evaluation types and their implementations.
 import logging
 from typing import Dict, Any, Callable, List
 
-from eval_datasets.custom.custom_mcq import evaluate_cumstom_mcq
+from eval_datasets.custom.custom_mcq import evaluate_custom_mcq
 from eval_datasets.custom.grammar import evaluate_grammar_dataset  
 from eval_datasets.custom.math import evaluate_math_dataset
 from eval_datasets.huggingface.arc import evaluate_arc
@@ -24,7 +24,7 @@ class DatasetRegistry:
         """Initialize registry with available evaluators."""
         self._evaluators: Dict[str, Callable] = {
             "grammar": evaluate_grammar_dataset,
-            "custom_mcq": evaluate_cumstom_mcq,
+            "custom_mcq": evaluate_custom_mcq,
             "math": evaluate_math_dataset,
             "gsm8k": evaluate_gsm8k_dataset,
             "arc": evaluate_arc,
