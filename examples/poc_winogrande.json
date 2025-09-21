@@ -1,0 +1,11 @@
+[
+  {
+    "eval_type": "winogrande",
+    "dataset_path": "allenai/winogrande",
+    "dataset_name": "winogrande",
+    "subset": "winogrande_s",      
+    "split": "validation",
+    "seed": 42,
+    "sample_size": 10
+  }
+]

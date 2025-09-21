@@ -1,0 +1,11 @@
+[
+  {
+    "eval_type": "arc",
+    "dataset_path": "allenai/openbookqa",
+    "dataset_name": "openbookqa",
+    "subset": "main",
+    "split": "validation",
+    "seed": 42,
+    "sample_size": 10  
+  }
+]

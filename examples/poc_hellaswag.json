@@ -1,0 +1,10 @@
+[
+  {
+    "eval_type": "hellaswag",
+    "dataset_path": "Rowan/hellaswag",
+    "dataset_name": "hellaswag",
+    "split": "validation",
+    "seed": 42,
+    "sample_size": 10  
+  }
+]

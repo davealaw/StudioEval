@@ -101,6 +101,4 @@ dmypy.json
 *.rej
 
 # In progress files
-*.json
-*.txt
 warp.md
