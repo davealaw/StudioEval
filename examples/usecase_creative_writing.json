@@ -14,5 +14,13 @@
     "split": null,
     "seed": null,
     "sample_size": null
+  },
+  {
+    "eval_type": "hellaswag",
+    "dataset_path": "tinyBenchmarks/tinyHellaswag",
+    "dataset_name": "tinyHellaswag",
+    "split": null,
+    "seed": null,
+    "sample_size": null
   }
 ]

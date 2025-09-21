@@ -39,5 +39,13 @@
     "split": null,
     "seed": null,
     "sample_size": null
+  },
+  {
+    "eval_type": "winogrande",
+    "dataset_path": "tinyBenchmarks/tinyWinogrande",
+    "dataset_name": "tinyWinogrande",
+    "split": null,
+    "seed": null,
+    "sample_size": null
   }
 ]

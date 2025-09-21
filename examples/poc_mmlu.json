@@ -9,7 +9,7 @@
     "sample_size": 10    
   },
   {
-    "eval_type": "arc",
+    "eval_type": "mmlu",
     "dataset_path": "cais/mmlu",
     "dataset_name": "mmlu_machine_learning",
     "subset": "machine_learning",

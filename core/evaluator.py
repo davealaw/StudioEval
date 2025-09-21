@@ -99,11 +99,22 @@ class EvaluationOrchestrator:
             logger.error(str(e))
             return False
         
+        # Load and validate dataset configuration once (before model loop)
+        try:
+            datasets_to_run = self._load_datasets_config(datasets_config)
+        except (FileNotFoundError, json.JSONDecodeError, PermissionError, ValueError) as e:
+            logger.error(f"❌ Configuration validation failed: {e}")
+            logger.error(f"🚫 Cannot proceed with evaluation of {len(resolved_models)} model(s) due to invalid configuration")
+            return False
+        
+        logger.info(f"✅ Configuration validated successfully")
+        logger.info(f"📊 Will evaluate {len(resolved_models)} model(s) on {len(datasets_to_run)} dataset(s)\n")
+        
         # Evaluate each model
         for model_id in resolved_models:
             self._evaluate_single_model(
                 model_id=model_id,
-                datasets_config=datasets_config,
+                datasets_to_run=datasets_to_run,  # Pass pre-loaded config
                 sample_size=sample_size,
                 seed=seed,
                 raw_duration=raw_duration,
@@ -115,7 +126,7 @@ class EvaluationOrchestrator:
     
     def _evaluate_single_model(self, 
                               model_id: str,
-                              datasets_config: str = None,
+                              datasets_to_run: List[Dict[str, Any]] = None,
                               sample_size: int = 0,
                               seed: int = 42,
                               raw_duration: bool = False,
@@ -126,7 +137,7 @@ class EvaluationOrchestrator:
         
         Args:
             model_id: Model identifier
-            datasets_config: Path to datasets configuration
+            datasets_to_run: Pre-loaded list of dataset configurations
             sample_size: Number of samples per dataset
             seed: Random seed
             raw_duration: Output format for duration
@@ -143,69 +154,178 @@ class EvaluationOrchestrator:
         results = []
         total_tokens_per_sec = 0
         
-        try:
-            # Load dataset configuration
-            datasets_to_run = self._load_datasets_config(datasets_config)
-            
-            # Evaluate each dataset
-            for dataset_config in datasets_to_run:
-                result = self._evaluate_single_dataset(
-                    model_id=model_id,
-                    dataset_config=dataset_config,
-                    sample_size=sample_size,
-                    seed=seed,
-                    cli_explicit_args=cli_explicit_args,
-                    **kwargs
-                )
-                
-                if result:
-                    results.append(result)
-                    total_tokens_per_sec += result["tok_per_sec"]
-                    
-                    logger.info(f"✅ {result['dataset']} accuracy: {result['accuracy']}% ({result['correct']}/{result['total']})")
-                    logger.info(f"📊 {result['dataset']} average response tokens/sec: {result['tok_per_sec']:.2f}\n")
-            
-            # Save results and log summary
-            self._save_results(results)
-            self._log_evaluation_summary(
+        # Evaluate each dataset (configuration already validated at orchestrator level)
+        for dataset_config in datasets_to_run:
+            result = self._evaluate_single_dataset(
                 model_id=model_id,
-                results=results, 
-                start_time=start_time,
-                total_tokens_per_sec=total_tokens_per_sec,
-                raw_duration=raw_duration
+                dataset_config=dataset_config,
+                sample_size=sample_size,
+                seed=seed,
+                cli_explicit_args=cli_explicit_args,
+                **kwargs
             )
             
-        except (FileNotFoundError, json.JSONDecodeError, PermissionError) as e:
-            logger.error(f"Configuration error for model {model_id}: {e}")
-            logger.error("Skipping evaluation for this model due to configuration issues.")
-            return  # Exit gracefully without results
-            
-        finally:
-            # Always unload model
-            self.model_manager.unload_model(model_id)
-            logger.info("-" * 41 + "\n")
-            time.sleep(2)
-    
+            if result:
+                results.append(result)
+                total_tokens_per_sec += result["tok_per_sec"]
+                
+                logger.info(f"✅ {result['dataset']} accuracy: {result['accuracy']}% ({result['correct']}/{result['total']})")
+                logger.info(f"📊 {result['dataset']} average response tokens/sec: {result['tok_per_sec']:.2f}\n")
+        
+        # Save results and log summary
+        self._save_results(results)
+        self._log_evaluation_summary(
+            model_id=model_id,
+            results=results, 
+            start_time=start_time,
+            total_tokens_per_sec=total_tokens_per_sec,
+            raw_duration=raw_duration
+        )
+        
+        # Always unload model
+        self.model_manager.unload_model(model_id)
+        logger.info("-" * 41 + "\n")
+        time.sleep(2)
     def _load_datasets_config(self, datasets_config = None) -> List[Dict[str, Any]]:
         """Load datasets configuration from file, list, or use defaults."""
         if datasets_config:
             # If it's already a list, return it directly
             if isinstance(datasets_config, list):
-                return datasets_config
+                return self._validate_config_structure(datasets_config, "<provided list>")
             # Otherwise treat as file path
             try:
                 with open(datasets_config, "r") as f:
-                    return json.load(f)
+                    content = f.read().strip()
+                    if not content:
+                        logger.error(f"❌ Configuration file is empty: {datasets_config}")
+                        logger.error("💡 Hint: Add a valid JSON array of dataset configurations")
+                        raise ValueError("Empty configuration file")
+                    
+                    data = json.loads(content)
+                    return self._validate_config_structure(data, datasets_config)
+                    
             except json.JSONDecodeError as e:
-                logger.error(f"Failed to parse JSON config file: {datasets_config}")
-                logger.error(f"{e.msg} at line {e.lineno}, column {e.colno} (char {e.pos})")
-                logger.error("Hint: Check for missing commas, quotes, or mismatched brackets.")
+                self._handle_json_parse_error(e, datasets_config)
                 raise
             except FileNotFoundError:
-                logger.error(f"Config file not found: {datasets_config}")
+                logger.error(f"❌ Configuration file not found: {datasets_config}")
+                logger.error(f"💡 Hint: Check the file path or create the configuration file")
+                logger.error(f"   Example working files: examples/poc_arc.json, examples/run_base_benchmarks.json")
+                raise
+            except PermissionError:
+                logger.error(f"❌ Permission denied reading file: {datasets_config}")
+                logger.error(f"💡 Hint: Check file permissions with: ls -la {datasets_config}")
                 raise
         else:
             return default_datasets_to_run
+    
+    def _validate_config_structure(self, data: Any, source: str) -> List[Dict[str, Any]]:
+        """Validate and fix configuration structure with helpful error messages."""
+        
+        # Check if data is a dictionary (common mistake - should be array)
+        if isinstance(data, dict):
+            logger.warning(f"⚠️  Configuration in {source} is a single object, but should be an array")
+            logger.info(f"🔧 Auto-fixing: Wrapping single configuration in array")
+            logger.info(f"💡 Recommendation: Update your JSON file to use array format:")
+            logger.info(f"   Current:  {{ \"eval_type\": \"...\", ... }}")
+            logger.info(f"   Correct: [{{ \"eval_type\": \"...\", ... }}]")
+            data = [data]  # Auto-fix by wrapping in array
+        
+        # Check if data is a list
+        if not isinstance(data, list):
+            logger.error(f"❌ Configuration must be a JSON array, got {type(data).__name__}: {source}")
+            logger.error(f"💡 Expected format: [ {{ \"eval_type\": \"arc\", ... }}, {{ ... }} ]")
+            raise ValueError(f"Configuration must be an array, got {type(data).__name__}")
+        
+        # Check if list is empty
+        if not data:
+            logger.error(f"❌ Configuration array is empty: {source}")
+            logger.error(f"💡 Add at least one dataset configuration")
+            raise ValueError("Empty configuration array")
+        
+        # Validate each dataset configuration
+        for i, config in enumerate(data):
+            self._validate_dataset_config(config, i, source)
+        
+        return data
+    
+    def _validate_dataset_config(self, config: Any, index: int, source: str) -> None:
+        """Validate individual dataset configuration."""
+        if not isinstance(config, dict):
+            logger.error(f"❌ Dataset configuration #{index+1} must be an object, got {type(config).__name__}: {source}")
+            logger.error(f"💡 Expected: {{ \"eval_type\": \"arc\", \"dataset_path\": \"...\", ... }}")
+            raise ValueError(f"Dataset config #{index+1} must be a dictionary")
+        
+        # Check required fields
+        required_fields = ["eval_type", "dataset_path", "dataset_name"]
+        missing_fields = [field for field in required_fields if field not in config]
+        
+        if missing_fields:
+            logger.error(f"❌ Dataset configuration #{index+1} missing required fields: {missing_fields}")
+            logger.error(f"   Available fields: {list(config.keys())}")
+            logger.error(f"💡 Required fields: {required_fields}")
+            logger.error(f"   Example: {{")
+            logger.error(f"     \"eval_type\": \"arc\",")
+            logger.error(f"     \"dataset_path\": \"allenai/ai2_arc\",")
+            logger.error(f"     \"dataset_name\": \"ai2_arc_easy\",")
+            logger.error(f"     \"subset\": \"ARC-Easy\",")
+            logger.error(f"     \"split\": \"validation\",")
+            logger.error(f"     \"sample_size\": 10")
+            logger.error(f"   }}")
+            raise ValueError(f"Missing required fields in dataset config #{index+1}: {missing_fields}")
+        
+        # Check eval_type is supported
+        eval_type = config["eval_type"]
+        if not self.dataset_registry.is_supported(eval_type):
+            available_types = self.dataset_registry.list_supported_types()
+            logger.error(f"❌ Unsupported eval_type '{eval_type}' in dataset configuration #{index+1}")
+            logger.error(f"💡 Supported eval_types: {available_types}")
+            raise ValueError(f"Unsupported eval_type: {eval_type}")
+    
+    def _handle_json_parse_error(self, e: json.JSONDecodeError, file_path: str) -> None:
+        """Provide detailed guidance for JSON parsing errors."""
+        logger.error(f"❌ Failed to parse JSON configuration file: {file_path}")
+        logger.error(f"   Error: {e.msg} at line {e.lineno}, column {e.colno} (character {e.pos})")
+        
+        # Try to read the file and show the problematic line
+        try:
+            with open(file_path, 'r') as f:
+                lines = f.readlines()
+                if e.lineno <= len(lines):
+                    problem_line = lines[e.lineno - 1].rstrip()
+                    logger.error(f"   Problem line {e.lineno}: {problem_line}")
+                    
+                    # Show a pointer to the error position
+                    if e.colno > 0:
+                        pointer = ' ' * (e.colno - 1) + '^'
+                        logger.error(f"   {' ' * (len(str(e.lineno)) + 16)}{pointer}")
+        except Exception:
+            pass  # If we can't read the file for context, just skip this part
+        
+        # Provide specific guidance based on common JSON errors
+        error_msg_lower = e.msg.lower()
+        if "expecting ',' delimiter" in error_msg_lower:
+            logger.error(f"💡 Hint: Missing comma between JSON elements")
+            logger.error(f"   Check if you need a comma after the previous line")
+        elif "expecting ':' delimiter" in error_msg_lower:
+            logger.error(f"💡 Hint: Missing colon ':' after a key")
+            logger.error(f"   Keys must be followed by a colon, e.g., \"key\": \"value\"")
+        elif "expecting value" in error_msg_lower:
+            logger.error(f"💡 Hint: Missing or invalid value")
+            logger.error(f"   Check for trailing commas or incomplete values")
+        elif "expecting property name" in error_msg_lower:
+            logger.error(f"💡 Hint: Missing or invalid property name")
+            logger.error(f"   Property names must be quoted strings")
+        elif "unterminated string" in error_msg_lower:
+            logger.error(f"💡 Hint: Unclosed string - missing closing quote")
+        elif "invalid escape sequence" in error_msg_lower:
+            logger.error(f"💡 Hint: Invalid escape sequence in string")
+            logger.error(f"   Use \\\\ for backslashes or \\/ for forward slashes")
+        else:
+            logger.error(f"💡 Hint: Check for missing commas, quotes, or mismatched brackets/braces")
+        
+        logger.error(f"📖 For reference, check working examples in: examples/poc_arc.json")
+    
     
     def _evaluate_single_dataset(self, 
                                 model_id: str,

@@ -9,11 +9,16 @@ logger = logging.getLogger(__name__)
 
 def evaluate_arc(model_id, dataset_path="tinyBenchmarks/tinyAI2_arc", dataset_name="tinyARC", subset=None, split="test", seed=42, sample_size=0):
     """
-    Evaluate the ARC (AI2 Reasoning Challenge) dataset with a language model.
+    Evaluate the ARC (AI2 Reasoning Challenge) dataset or compatible datasets with a language model.
+    
+    This evaluator supports:
+    - ARC dataset (allenai/ai2_arc) with "question" field
+    - OpenBookQA dataset (allenai/openbookqa) with "question_stem" field
+    - Any dataset with similar MCQ structure and "answerKey" field
     
     Args:
         model_id (str): Identifier for the model to query.
-        dataset_path (str): Path to the ARC dataset.
+        dataset_path (str): Path to the dataset (ARC, OpenBookQA, or compatible).
         dataset_name (str): Name of the dataset for logging.
         subset (str): Optional subset of the dataset to evaluate.
         split (str): Dataset split to evaluate (default is "test").
@@ -28,7 +33,7 @@ def evaluate_arc(model_id, dataset_path="tinyBenchmarks/tinyAI2_arc", dataset_na
     total = 0
     correct = 0
     skipped = 0
-    tokens_per_second_total = 0
+    tokens_per_second_total = 0.0
 
     for item in tqdm(dataset, desc=f"⏳ Evaluating {dataset_name}"):
     
@@ -40,7 +45,15 @@ def evaluate_arc(model_id, dataset_path="tinyBenchmarks/tinyAI2_arc", dataset_na
             skipped += 1
             continue
 
-        question = item["question"].strip()
+        # Handle both ARC ("question") and OpenBookQA ("question_stem") field names
+        if "question" in item:
+            question = item["question"].strip()
+        elif "question_stem" in item:
+            question = item["question_stem"].strip()
+        else:
+            logger.warning(f"No question field found in item: {list(item.keys())}")
+            skipped += 1
+            continue
         choices = item["choices"]
         
         # Build the prompt
@@ -80,5 +93,5 @@ def evaluate_arc(model_id, dataset_path="tinyBenchmarks/tinyAI2_arc", dataset_na
         "total": total,
         "skipped": skipped,
         "accuracy": round((correct / total * 100), 2) if total > 0 else 0.0,
-        "tok_per_sec": tokens_per_second_total / total if total > 0 else 0
+        "tok_per_sec": (tokens_per_second_total / total) if total > 0 else 0.0
     }

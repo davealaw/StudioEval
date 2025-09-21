@@ -48,6 +48,14 @@
     "sample_size": null
   },
   {
+    "eval_type": "winogrande",
+    "dataset_path": "tinyBenchmarks/tinyWinogrande",
+    "dataset_name": "tinyWinogrande",
+    "split": null,
+    "seed": null,
+    "sample_size": null
+  },
+  {
     "eval_type": "commonsenseqa",
     "dataset_path": "tau/commonsense_qa",
     "dataset_name": "commonsenseqa",

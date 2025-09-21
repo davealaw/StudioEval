@@ -140,9 +140,9 @@ class TestEvaluationIntegration:
     
     def test_load_datasets_config_from_file(self, orchestrator, temp_config_file):
         """Test loading datasets config from file."""
-        config_data = [{"eval_type": "test", "dataset_name": "test"}]
+        config_data = [{"eval_type": "grammar", "dataset_path": "test/path", "dataset_name": "test"}]
         config_path = temp_config_file(config_data)
-        
+    
         loaded_config = orchestrator._load_datasets_config(config_path)
         assert loaded_config == config_data
     

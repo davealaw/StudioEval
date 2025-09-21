@@ -1,8 +1,8 @@
 [
   {
-    "eval_type": "grammar",
-    "dataset_path": "eval_datasets/custom/data/grammar_dataset.jsonl",
-    "dataset_name": "grammar",
+    "eval_type": "hellaswag",
+    "dataset_path": "tinyBenchmarks/tinyHellaswag",
+    "dataset_name": "tinyHellaswag",
     "split": null,
     "seed": null,
     "sample_size": null

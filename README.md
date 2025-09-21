@@ -105,6 +105,8 @@ python studioeval.py --model-filter "llama*" --sample-size 50
 - **GSM8K** - Grade school math word problems   (Default tinyGSM8K)
 - **MMLU** (Massive Multitask Language Understanding) - Knowledge across 57 subjects (Default tinyMMLU)
 - **TruthfulQA** - Truthfulness evaluation - Single Answer (Default tinyTruthfulQA)
+- **WinoGrande** - Winograd Schema Challenge  - Fill-in-a-blank task with binary options (Default tinyWinoGrande)
+- **HellaSwag** - Commonsense sentence completion (Default tinyHellaswag)
 - **CommonSenseQA** - Commonsense reasoning
 - **LogiQA** - Logical reasoning
 

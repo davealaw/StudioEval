@@ -14,6 +14,8 @@ from eval_datasets.huggingface.gsm8k import evaluate_gsm8k_dataset
 from eval_datasets.huggingface.truthfulqa import evaluate_tiny_truthfulqa, extract_mc1_fields, prepare_mc1_item
 from eval_datasets.huggingface.commonsense_qa import evaluate_commonsense_qa
 from eval_datasets.huggingface.logiqa import evaluate_logiqa
+from eval_datasets.huggingface.hellaswag import evaluate_hellaswag
+from eval_datasets.huggingface.winogrande import evaluate_winogrande
 from eval_datasets.custom.custom_mcq import evaluate_custom_mcq
 from eval_datasets.custom.grammar import evaluate_grammar_dataset
 from eval_datasets.custom.math import evaluate_math_dataset
@@ -1561,4 +1563,571 @@ class TestLogiQAEvaluator:
         
         assert result["total"] == 4
         assert result["correct"] == 4  # All should be correct
+        assert result["accuracy"] == 100.0
+
+
+class TestHellaSwagEvaluator:
+    """Test HellaSwag evaluator."""
+    
+    @patch('eval_datasets.huggingface.hellaswag.load_dataset_with_config')
+    @patch('eval_datasets.huggingface.hellaswag.query_model')
+    @patch('eval_datasets.huggingface.hellaswag.time.sleep')
+    def test_hellaswag_evaluator_basic(self, mock_sleep, mock_query, mock_load):
+        """Test basic HellaSwag evaluation."""
+        mock_dataset = [
+            {
+                "ctx": "A man is sitting on a roof. He",
+                "endings": [
+                    "is using a laptop computer on his lap.",
+                    "is ripping level tiles off the roof.", 
+                    "is holding a rubik's cube.",
+                    "starts pulling up roofing on a roof."
+                ],
+                "label": "3"  # HellaSwag uses string labels
+            },
+            {
+                "ctx": "A woman is outside with a camera. She",
+                "endings": [
+                    "is taking pictures of a garden.",
+                    "is washing the camera.",
+                    "is talking to the camera.", 
+                    "is putting the camera in a bag."
+                ],
+                "label": "0"
+            }
+        ]
+        mock_load.return_value = mock_dataset
+        
+        # Setup mock model responses - both correct
+        mock_query.side_effect = [
+            ("Answer: D", {"tokens_per_second": 12.0}),  # Correct for label "3" 
+            ("Answer: A", {"tokens_per_second": 14.0})   # Correct for label "0"
+        ]
+        
+        result = evaluate_hellaswag("test_model", dataset_name="test_hellaswag")
+        
+        # Verify results
+        assert result["dataset"] == "test_hellaswag"
+        assert result["total"] == 2
+        assert result["correct"] == 2
+        assert result["skipped"] == 0
+        assert result["accuracy"] == 100.0
+        assert result["tok_per_sec"] == 13.0  # Average
+        
+        # Verify dataset loading parameters
+        mock_load.assert_called_once_with(
+            "tinyBenchmarks/tinyHellaswag",
+            subset=None,
+            split="validation",
+            seed=42,
+            sample_size=0
+        )
+        
+        assert mock_query.call_count == 2
+    
+    @patch('eval_datasets.huggingface.hellaswag.load_dataset_with_config')
+    @patch('eval_datasets.huggingface.hellaswag.query_model')
+    @patch('eval_datasets.huggingface.hellaswag.time.sleep')
+    def test_hellaswag_evaluator_wrong_answers(self, mock_sleep, mock_query, mock_load):
+        """Test HellaSwag evaluation with wrong answers."""
+        mock_dataset = [
+            {
+                "ctx": "Test context",
+                "endings": ["Wrong", "Also wrong", "Still wrong", "Correct"],
+                "label": "3"  # Correct answer is D
+            }
+        ]
+        mock_load.return_value = mock_dataset
+        mock_query.return_value = ("Answer: A", {"tokens_per_second": 8.0})  # Wrong choice
+        
+        result = evaluate_hellaswag("test_model")
+        
+        assert result["correct"] == 0
+        assert result["total"] == 1
+        assert result["accuracy"] == 0.0
+    
+    @patch('eval_datasets.huggingface.hellaswag.load_dataset_with_config')
+    @patch('eval_datasets.huggingface.hellaswag.query_model')
+    @patch('eval_datasets.huggingface.hellaswag.time.sleep')
+    def test_hellaswag_evaluator_mixed_results(self, mock_sleep, mock_query, mock_load):
+        """Test HellaSwag evaluation with mixed correct/incorrect answers."""
+        mock_dataset = [
+            {
+                "ctx": "Context 1",
+                "endings": ["Right", "Wrong", "Wrong", "Wrong"],
+                "label": "0"
+            },
+            {
+                "ctx": "Context 2", 
+                "endings": ["Wrong", "Right", "Wrong", "Wrong"],
+                "label": "1"
+            },
+            {
+                "ctx": "Context 3",
+                "endings": ["Wrong", "Wrong", "Right", "Wrong"],
+                "label": "2"
+            }
+        ]
+        mock_load.return_value = mock_dataset
+        
+        # First correct, second wrong, third correct
+        mock_query.side_effect = [
+            ("Answer: A", {"tokens_per_second": 9.0}),   # Correct
+            ("Answer: A", {"tokens_per_second": 10.0}),  # Wrong (should be B)
+            ("Answer: C", {"tokens_per_second": 11.0})   # Correct
+        ]
+        
+        result = evaluate_hellaswag("test_model")
+        
+        assert result["total"] == 3
+        assert result["correct"] == 2
+        assert result["accuracy"] == 66.67
+        assert result["tok_per_sec"] == 10.0
+    
+    @patch('eval_datasets.huggingface.hellaswag.load_dataset_with_config')
+    @patch('eval_datasets.huggingface.hellaswag.query_model')
+    @patch('eval_datasets.huggingface.hellaswag.time.sleep')
+    def test_hellaswag_evaluator_skips_malformed_items(self, mock_sleep, mock_query, mock_load):
+        """Test HellaSwag evaluation skips malformed items."""
+        mock_dataset = [
+            # Valid item
+            {
+                "ctx": "Valid context",
+                "endings": ["Option A", "Option B", "Option C", "Option D"],
+                "label": "1"
+            },
+            # Invalid items that should be skipped
+            {"ctx": "", "endings": ["A", "B", "C", "D"], "label": "0"},  # Empty context
+            {"ctx": "Test", "endings": ["Only one"], "label": "0"},  # < 2 endings
+            {"ctx": "Test", "endings": ["A", "B", "C", "D"]},  # Missing label
+            {"ctx": "Test", "endings": ["A", "B", "C", "D"], "label": "invalid"},  # Invalid label
+            {"ctx": "Test", "endings": ["A", "B", "C", "D"], "label": "5"},  # Label out of range
+        ]
+        mock_load.return_value = mock_dataset
+        mock_query.return_value = ("Answer: B", {"tokens_per_second": 7.0})
+        
+        result = evaluate_hellaswag("test_model")
+        
+        assert result["total"] == 1  # Only 1 valid item processed
+        assert result["skipped"] == 5  # 5 invalid items skipped
+        assert mock_query.call_count == 1
+    
+    @patch('eval_datasets.huggingface.hellaswag.load_dataset_with_config')
+    @patch('eval_datasets.huggingface.hellaswag.query_model')
+    @patch('eval_datasets.huggingface.hellaswag.time.sleep')
+    def test_hellaswag_evaluator_prompt_formatting(self, mock_sleep, mock_query, mock_load):
+        """Test that HellaSwag prompts are formatted correctly."""
+        mock_dataset = [
+            {
+                "ctx": "A man is working on a roof. He",
+                "endings": [
+                    "picks up a hammer and nails.",
+                    "starts climbing a ladder.",
+                    "begins removing old shingles.",
+                    "looks at his phone."
+                ],
+                "label": "2"
+            }
+        ]
+        mock_load.return_value = mock_dataset
+        mock_query.return_value = ("Answer: C", {"tokens_per_second": 10.0})
+        
+        evaluate_hellaswag("test_model")
+        
+        # Check that the prompt was formatted correctly
+        call_args = mock_query.call_args[0][0]
+        
+        assert "Choose the single best continuation for the context." in call_args
+        assert "A man is working on a roof. He" in call_args
+        assert "A. picks up a hammer and nails." in call_args
+        assert "B. starts climbing a ladder." in call_args
+        assert "C. begins removing old shingles." in call_args
+        assert "D. looks at his phone." in call_args
+        assert "Only respond with the letter prefixed with 'Answer:'" in call_args
+        assert "Context:" in call_args
+        assert "Choices:" in call_args
+    
+    @patch('eval_datasets.huggingface.hellaswag.load_dataset_with_config')
+    @patch('eval_datasets.huggingface.hellaswag.query_model')
+    @patch('eval_datasets.huggingface.hellaswag.time.sleep')
+    def test_hellaswag_evaluator_unparseable_response(self, mock_sleep, mock_query, mock_load):
+        """Test HellaSwag evaluation with unparseable model responses."""
+        mock_dataset = [
+            {
+                "ctx": "Test context",
+                "endings": ["Option A", "Option B", "Option C", "Option D"],
+                "label": "0"
+            }
+        ]
+        mock_load.return_value = mock_dataset
+        
+        # Model gives unparseable response
+        mock_query.return_value = ("I think the answer might be somewhere in the middle", {"tokens_per_second": 5.0})
+        
+        result = evaluate_hellaswag("test_model")
+        
+        assert result["total"] == 1
+        assert result["correct"] == 0  # No valid letter extracted
+        assert result["accuracy"] == 0.0
+    
+    @patch('eval_datasets.huggingface.hellaswag.load_dataset_with_config')
+    @patch('eval_datasets.huggingface.hellaswag.query_model')
+    @patch('eval_datasets.huggingface.hellaswag.time.sleep')
+    def test_hellaswag_evaluator_custom_parameters(self, mock_sleep, mock_query, mock_load):
+        """Test HellaSwag evaluation with custom parameters."""
+        mock_dataset = []
+        mock_load.return_value = mock_dataset
+        
+        # Test custom parameters
+        result = evaluate_hellaswag(
+            "custom_model",
+            dataset_path="custom/hellaswag",
+            dataset_name="custom_hellaswag",
+            subset="custom_subset",
+            split="test",
+            seed=999,
+            sample_size=25
+        )
+        
+        # Verify parameters were passed correctly
+        mock_load.assert_called_once_with(
+            "custom/hellaswag",
+            subset="custom_subset",
+            split="test",
+            seed=999,
+            sample_size=25
+        )
+        
+        assert result["dataset"] == "custom_hellaswag"
+    
+    @patch('eval_datasets.huggingface.hellaswag.load_dataset_with_config')
+    def test_hellaswag_evaluator_empty_dataset(self, mock_load):
+        """Test HellaSwag evaluation with empty dataset."""
+        mock_load.return_value = []
+        
+        result = evaluate_hellaswag("test_model")
+        
+        assert result["total"] == 0
+        assert result["correct"] == 0
+        assert result["skipped"] == 0
+        assert result["accuracy"] == 0.0
+        assert result["tok_per_sec"] == 0
+    
+    @patch('eval_datasets.huggingface.hellaswag.load_dataset_with_config')
+    @patch('eval_datasets.huggingface.hellaswag.query_model')
+    @patch('eval_datasets.huggingface.hellaswag.time.sleep')
+    def test_hellaswag_handles_integer_labels(self, mock_sleep, mock_query, mock_load):
+        """Test HellaSwag evaluation handles integer labels as well as string labels."""
+        mock_dataset = [
+            {
+                "ctx": "Context with int label",
+                "endings": ["A", "B", "C", "D"],
+                "label": 2  # Integer label instead of string
+            }
+        ]
+        mock_load.return_value = mock_dataset
+        mock_query.return_value = ("Answer: C", {"tokens_per_second": 8.0})
+        
+        result = evaluate_hellaswag("test_model")
+        
+        assert result["total"] == 1
+        assert result["correct"] == 1  # Should handle integer label correctly
+        assert result["accuracy"] == 100.0
+
+
+class TestWinoGrandeEvaluator:
+    """Test WinoGrande evaluator."""
+    
+    @patch('eval_datasets.huggingface.winogrande.load_dataset_with_config')
+    @patch('eval_datasets.huggingface.winogrande.query_model')
+    @patch('eval_datasets.huggingface.winogrande.time.sleep')
+    def test_winogrande_evaluator_basic(self, mock_sleep, mock_query, mock_load):
+        """Test basic WinoGrande evaluation."""
+        mock_dataset = [
+            {
+                "sentence": "The trophy doesn't fit in the brown suitcase because _ is too small.",
+                "option1": "the trophy",
+                "option2": "the suitcase",
+                "answer": "2"  # WinoGrande uses "1"/"2" format
+            },
+            {
+                "sentence": "Joan made sure to thank Susan for all the help she had given _.",
+                "option1": "Joan", 
+                "option2": "Susan",
+                "answer": "1"
+            }
+        ]
+        mock_load.return_value = mock_dataset
+        
+        # Setup mock model responses - both correct
+        mock_query.side_effect = [
+            ("Answer: B", {"tokens_per_second": 11.0}),  # Correct for answer "2" 
+            ("Answer: A", {"tokens_per_second": 13.0})   # Correct for answer "1"
+        ]
+        
+        result = evaluate_winogrande("test_model", dataset_name="test_winogrande")
+        
+        # Verify results
+        assert result["dataset"] == "test_winogrande"
+        assert result["total"] == 2
+        assert result["correct"] == 2
+        assert result["skipped"] == 0
+        assert result["accuracy"] == 100.0
+        assert result["tok_per_sec"] == 12.0  # Average
+        
+        # Verify dataset loading parameters
+        mock_load.assert_called_once_with(
+            "tinyBenchmarks/tinyWinogrande",
+            subset=None,
+            split="validation",
+            seed=42,
+            sample_size=0
+        )
+        
+        assert mock_query.call_count == 2
+    
+    @patch('eval_datasets.huggingface.winogrande.load_dataset_with_config')
+    @patch('eval_datasets.huggingface.winogrande.query_model')
+    @patch('eval_datasets.huggingface.winogrande.time.sleep')
+    def test_winogrande_evaluator_wrong_answers(self, mock_sleep, mock_query, mock_load):
+        """Test WinoGrande evaluation with wrong answers."""
+        mock_dataset = [
+            {
+                "sentence": "The _ was too big for the box.",
+                "option1": "item",
+                "option2": "container", 
+                "answer": "1"  # Correct answer is A
+            }
+        ]
+        mock_load.return_value = mock_dataset
+        mock_query.return_value = ("Answer: B", {"tokens_per_second": 9.0})  # Wrong choice
+        
+        result = evaluate_winogrande("test_model")
+        
+        assert result["correct"] == 0
+        assert result["total"] == 1
+        assert result["accuracy"] == 0.0
+    
+    @patch('eval_datasets.huggingface.winogrande.load_dataset_with_config')
+    @patch('eval_datasets.huggingface.winogrande.query_model')
+    @patch('eval_datasets.huggingface.winogrande.time.sleep')
+    def test_winogrande_evaluator_mixed_results(self, mock_sleep, mock_query, mock_load):
+        """Test WinoGrande evaluation with mixed correct/incorrect answers."""
+        mock_dataset = [
+            {
+                "sentence": "Sentence 1 with _.",
+                "option1": "first",
+                "option2": "second",
+                "answer": "1"
+            },
+            {
+                "sentence": "Sentence 2 with _.", 
+                "option1": "first",
+                "option2": "second",
+                "answer": "2"
+            },
+            {
+                "sentence": "Sentence 3 with _.",
+                "option1": "first",
+                "option2": "second",
+                "answer": "1"
+            }
+        ]
+        mock_load.return_value = mock_dataset
+        
+        # First correct, second wrong, third correct
+        mock_query.side_effect = [
+            ("Answer: A", {"tokens_per_second": 8.0}),   # Correct
+            ("Answer: A", {"tokens_per_second": 9.0}),   # Wrong (should be B)
+            ("Answer: A", {"tokens_per_second": 10.0})   # Correct
+        ]
+        
+        result = evaluate_winogrande("test_model")
+        
+        assert result["total"] == 3
+        assert result["correct"] == 2
+        assert result["accuracy"] == 66.67
+        assert result["tok_per_sec"] == 9.0
+    
+    @patch('eval_datasets.huggingface.winogrande.load_dataset_with_config')
+    @patch('eval_datasets.huggingface.winogrande.query_model')
+    @patch('eval_datasets.huggingface.winogrande.time.sleep')
+    def test_winogrande_evaluator_skips_malformed_items(self, mock_sleep, mock_query, mock_load):
+        """Test WinoGrande evaluation skips malformed items."""
+        mock_dataset = [
+            # Valid item
+            {
+                "sentence": "Valid sentence with _.",
+                "option1": "option A",
+                "option2": "option B",
+                "answer": "1"
+            },
+            # Invalid items that should be skipped
+            {"sentence": "", "option1": "A", "option2": "B", "answer": "1"},  # Empty sentence
+            {"sentence": "Test _.", "option1": "", "option2": "B", "answer": "1"},  # Empty option1
+            {"sentence": "Test _.", "option1": "A", "option2": "", "answer": "1"},  # Empty option2
+            {"sentence": "Test _.", "option1": "A", "option2": "B", "answer": ""},  # Empty answer
+            {"sentence": "Test _.", "option1": "A", "option2": "B"},  # Missing answer
+            {"sentence": "Test _.", "option1": "A", "option2": "B", "answer": "3"},  # Invalid answer
+            {"sentence": "Test _.", "option1": "A", "option2": "B", "answer": "invalid"},  # Non-numeric answer
+        ]
+        mock_load.return_value = mock_dataset
+        mock_query.return_value = ("Answer: A", {"tokens_per_second": 7.0})
+        
+        result = evaluate_winogrande("test_model")
+        
+        assert result["total"] == 1  # Only 1 valid item processed
+        assert result["skipped"] == 7  # 7 invalid items skipped
+        assert mock_query.call_count == 1
+    
+    @patch('eval_datasets.huggingface.winogrande.load_dataset_with_config')
+    @patch('eval_datasets.huggingface.winogrande.query_model')
+    @patch('eval_datasets.huggingface.winogrande.time.sleep')
+    def test_winogrande_evaluator_answer_format_handling(self, mock_sleep, mock_query, mock_load):
+        """Test WinoGrande evaluation handles different answer formats."""
+        mock_dataset = [
+            {"sentence": "Test 1 _.", "option1": "A", "option2": "B", "answer": "1"},  # Standard "1"
+            {"sentence": "Test 2 _.", "option1": "A", "option2": "B", "answer": "2"},  # Standard "2"
+            {"sentence": "Test 3 _.", "option1": "A", "option2": "B", "answer": "A"},  # Letter "A"
+            {"sentence": "Test 4 _.", "option1": "A", "option2": "B", "answer": "B"},  # Letter "B"
+            {"sentence": "Test 5 _.", "option1": "A", "option2": "B", "answer": "a"},  # Lowercase "a"
+            {"sentence": "Test 6 _.", "option1": "A", "option2": "B", "answer": "b"},  # Lowercase "b"
+        ]
+        mock_load.return_value = mock_dataset
+        
+        # All correct responses
+        mock_query.side_effect = [
+            ("Answer: A", {"tokens_per_second": 8.0}),
+            ("Answer: B", {"tokens_per_second": 8.0}),
+            ("Answer: A", {"tokens_per_second": 8.0}),
+            ("Answer: B", {"tokens_per_second": 8.0}),
+            ("Answer: A", {"tokens_per_second": 8.0}),
+            ("Answer: B", {"tokens_per_second": 8.0})
+        ]
+        
+        result = evaluate_winogrande("test_model")
+        
+        assert result["total"] == 6
+        assert result["correct"] == 6  # All should be correct regardless of format
+        assert result["accuracy"] == 100.0
+    
+    @patch('eval_datasets.huggingface.winogrande.load_dataset_with_config')
+    @patch('eval_datasets.huggingface.winogrande.query_model')
+    @patch('eval_datasets.huggingface.winogrande.time.sleep')
+    def test_winogrande_evaluator_prompt_formatting(self, mock_sleep, mock_query, mock_load):
+        """Test that WinoGrande prompts are formatted correctly."""
+        mock_dataset = [
+            {
+                "sentence": "The trophy doesn't fit in the brown suitcase because _ is too small.",
+                "option1": "the trophy",
+                "option2": "the suitcase",
+                "answer": "2"
+            }
+        ]
+        mock_load.return_value = mock_dataset
+        mock_query.return_value = ("Answer: B", {"tokens_per_second": 10.0})
+        
+        evaluate_winogrande("test_model")
+        
+        # Check that the prompt was formatted correctly
+        call_args = mock_query.call_args[0][0]
+        
+        assert "You are given a sentence with a blank indicated by an underscore" in call_args
+        assert "Choose the option (A or B) that best fills the blank" in call_args
+        assert "The trophy doesn't fit in the brown suitcase because _ is too small." in call_args
+        assert "A. the trophy" in call_args
+        assert "B. the suitcase" in call_args
+        assert "Only respond with the letter (A or B) prefixed with 'Answer:'" in call_args
+        assert "Sentence:" in call_args
+        assert "Choices:" in call_args
+    
+    @patch('eval_datasets.huggingface.winogrande.load_dataset_with_config')
+    @patch('eval_datasets.huggingface.winogrande.query_model')
+    @patch('eval_datasets.huggingface.winogrande.time.sleep')
+    def test_winogrande_evaluator_unparseable_response(self, mock_sleep, mock_query, mock_load):
+        """Test WinoGrande evaluation with unparseable model responses."""
+        mock_dataset = [
+            {
+                "sentence": "Test sentence with _.",
+                "option1": "option A",
+                "option2": "option B",
+                "answer": "1"
+            }
+        ]
+        mock_load.return_value = mock_dataset
+        
+        # Model gives unparseable response
+        mock_query.return_value = ("I think both options are valid in this context", {"tokens_per_second": 5.0})
+        
+        result = evaluate_winogrande("test_model")
+        
+        assert result["total"] == 1
+        assert result["correct"] == 0  # No valid letter extracted
+        assert result["accuracy"] == 0.0
+    
+    @patch('eval_datasets.huggingface.winogrande.load_dataset_with_config')
+    @patch('eval_datasets.huggingface.winogrande.query_model')
+    @patch('eval_datasets.huggingface.winogrande.time.sleep')
+    def test_winogrande_evaluator_custom_parameters(self, mock_sleep, mock_query, mock_load):
+        """Test WinoGrande evaluation with custom parameters."""
+        mock_dataset = []
+        mock_load.return_value = mock_dataset
+        
+        # Test custom parameters
+        result = evaluate_winogrande(
+            "custom_model",
+            dataset_path="custom/winogrande",
+            dataset_name="custom_winogrande",
+            subset="custom_subset",
+            split="test",
+            seed=888,
+            sample_size=30
+        )
+        
+        # Verify parameters were passed correctly
+        mock_load.assert_called_once_with(
+            "custom/winogrande",
+            subset="custom_subset",
+            split="test",
+            seed=888,
+            sample_size=30
+        )
+        
+        assert result["dataset"] == "custom_winogrande"
+    
+    @patch('eval_datasets.huggingface.winogrande.load_dataset_with_config')
+    def test_winogrande_evaluator_empty_dataset(self, mock_load):
+        """Test WinoGrande evaluation with empty dataset."""
+        mock_load.return_value = []
+        
+        result = evaluate_winogrande("test_model")
+        
+        assert result["total"] == 0
+        assert result["correct"] == 0
+        assert result["skipped"] == 0
+        assert result["accuracy"] == 0.0
+        assert result["tok_per_sec"] == 0
+    
+    @patch('eval_datasets.huggingface.winogrande.load_dataset_with_config')
+    @patch('eval_datasets.huggingface.winogrande.query_model')
+    @patch('eval_datasets.huggingface.winogrande.time.sleep')
+    def test_winogrande_uses_extract_mcq_letter(self, mock_sleep, mock_query, mock_load):
+        """Test that WinoGrande uses extract_mcq_letter for binary choice extraction."""
+        mock_dataset = [
+            {
+                "sentence": "The _ was perfect for the task.",
+                "option1": "tool",
+                "option2": "worker",
+                "answer": "1"
+            }
+        ]
+        mock_load.return_value = mock_dataset
+        
+        # Model response contains both A and B, but extract_mcq_letter should handle this correctly
+        mock_query.return_value = ("I think Answer: A is the best choice between A and B", {"tokens_per_second": 8.0})
+        
+        result = evaluate_winogrande("test_model")
+        
+        assert result["total"] == 1
+        assert result["correct"] == 1  # Should correctly extract A
         assert result["accuracy"] == 100.0

@@ -36,39 +36,39 @@ class TestConfigFileErrorHandling:
     """Test error handling for configuration file issues."""
     
     def test_nonexistent_config_file_graceful_handling(self, orchestrator, caplog):
-        """Test that nonexistent config files are handled gracefully."""
+        """Test that nonexistent config files are handled gracefully with fail-fast behavior."""
         # This should NOT raise an exception but handle it gracefully
         result = orchestrator.run_evaluation(
             model="test-model",
             datasets_config="nonexistent_config.json"
         )
-        
-        # Should complete successfully despite config error
-        assert result is True
+    
+        # Should fail fast when config is invalid (correct behavior)
+        assert result is False
         
         # Should log appropriate error messages
-        assert "Config file not found: nonexistent_config.json" in caplog.text
-        assert "Configuration error for model test-model" in caplog.text
-        assert "Skipping evaluation for this model due to configuration issues" in caplog.text
+        assert "Configuration file not found: nonexistent_config.json" in caplog.text
+        assert "Configuration validation failed" in caplog.text
+        assert "Cannot proceed with evaluation" in caplog.text
     
     def test_malformed_json_config_file_graceful_handling(self, orchestrator, caplog, tmp_path):
-        """Test that malformed JSON config files are handled gracefully."""
+        """Test that malformed JSON config files are handled gracefully with fail-fast behavior."""
         # Create malformed JSON file
         malformed_config = tmp_path / "malformed.json"
         malformed_config.write_text('{"invalid": json, "missing": quotes}')
-        
+    
         result = orchestrator.run_evaluation(
-            model="test-model", 
+            model="test-model",
             datasets_config=str(malformed_config)
         )
-        
-        # Should complete successfully despite JSON error
-        assert result is True
+    
+        # Should fail fast when JSON is invalid (correct behavior)
+        assert result is False
         
         # Should log appropriate error messages
-        assert "Failed to parse JSON config file" in caplog.text
-        assert "Configuration error for model test-model" in caplog.text
-        assert "Skipping evaluation for this model due to configuration issues" in caplog.text
+        assert "Failed to parse JSON configuration file" in caplog.text
+        assert "Configuration validation failed" in caplog.text
+        assert "Cannot proceed with evaluation" in caplog.text
     
     def test_valid_config_file_works_normally(self, orchestrator, tmp_path):
         """Test that valid config files work normally."""
@@ -105,17 +105,17 @@ class TestConfigFileErrorHandling:
             mock_eval.assert_called_once()
     
     def test_empty_config_file_handling(self, orchestrator, tmp_path):
-        """Test handling of empty config files."""
+        """Test handling of empty config files with fail-fast behavior."""
         empty_config = tmp_path / "empty.json"
         empty_config.write_text("")
-        
+    
         result = orchestrator.run_evaluation(
             model="test-model",
             datasets_config=str(empty_config)
         )
-        
-        # Should handle empty file gracefully
-        assert result is True
+    
+        # Should fail fast when config is empty (correct behavior)
+        assert result is False
     
     def test_config_with_permission_error(self, orchestrator, tmp_path):
         """Test handling of config files with permission issues."""
@@ -135,61 +135,63 @@ class TestConfigFileErrorHandling:
                 datasets_config=str(restricted_config)
             )
             
-            # Should handle permission error gracefully
-            assert result is True
+            # Should fail fast when permissions prevent reading config (correct behavior)
+            assert result is False
             
         finally:
             # Restore permissions for cleanup
             os.chmod(str(restricted_config), 0o644)
     
     def test_model_unloading_after_config_error(self, test_mock_client, orchestrator):
-        """Test that model is properly unloaded even when config loading fails."""
+        """Test that models are not loaded when config validation fails early."""
         # Track model loading/unloading
         load_calls = []
         unload_calls = []
-        
+    
         original_load = test_mock_client.load_model
         original_unload = test_mock_client.unload_model
-        
+    
         def mock_load(model_id):
             load_calls.append(model_id)
             return original_load(model_id)
-            
+    
         def mock_unload(model_id=None):
             unload_calls.append(model_id)
             return original_unload(model_id)
-        
+    
         test_mock_client.load_model = mock_load
         test_mock_client.unload_model = mock_unload
-        
+    
         # Run evaluation with nonexistent config
         result = orchestrator.run_evaluation(
             model="test-model",
             datasets_config="nonexistent.json"
         )
-        
-        assert result is True
-        assert len(load_calls) == 1
-        assert load_calls[0] == "test-model"
-        assert len(unload_calls) == 1
-        assert unload_calls[0] == "test-model"
+    
+        # Should fail fast before any model loading
+        assert result is False
+    
+        # Verify that no models were loaded (config validation happens first)
+        assert len(load_calls) == 0, "No models should be loaded when config is invalid"
+        assert len(unload_calls) == 0, "No models should need unloading when none were loaded"
     
     def test_multiple_models_with_config_error(self, orchestrator, caplog):
-        """Test that config errors don't prevent other models from being evaluated."""
+        """Test that config errors prevent all model evaluation (fail-fast behavior)."""
         # Add more models to the mock client
         orchestrator.model_manager.client.available_models.extend(["model-2", "model-3"])
         orchestrator.model_manager.client.responses.update({
-            "model-2": "Answer: B", 
+            "model-2": "Answer: B",
             "model-3": "Answer: C"
         })
-        
+    
         result = orchestrator.run_evaluation(
             all_models=True,
             datasets_config="nonexistent.json"
         )
+    
+        # Should fail fast for all models when config is invalid (correct behavior)
+        assert result is False
         
-        assert result is True
-        
-        # Should log config errors for each model
-        config_error_count = caplog.text.count("Configuration error for model")
-        assert config_error_count == 3  # One for each model
+        # Should log single configuration validation failure (fail-fast)
+        assert "Configuration validation failed" in caplog.text
+        assert "Cannot proceed with evaluation of 3 model(s)" in caplog.text

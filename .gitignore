@@ -99,3 +99,8 @@ dmypy.json
 *.bak
 *.orig
 *.rej
+
+# In progress files
+*.json
+*.txt
+warp.md

@@ -1,8 +1,8 @@
 [
   {
     "eval_type": "truthfulqa",
-    "dataset_path": "TruthfulQA",
-    "dataset_name": "tinyTruthfulQA",
+    "dataset_path": "truthfulqa/truthful_qa",
+    "dataset_name": "truthfulQA",
     "subset": "multiple_choice",    
     "split": "validation",
     "seed": 42,

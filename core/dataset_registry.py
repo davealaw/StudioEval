@@ -11,6 +11,8 @@ from eval_datasets.huggingface.arc import evaluate_arc
 from eval_datasets.huggingface.mmlu import evaluate_mmlu
 from eval_datasets.huggingface.truthfulqa import evaluate_tiny_truthfulqa
 from eval_datasets.huggingface.gsm8k import evaluate_gsm8k_dataset
+from eval_datasets.huggingface.winogrande import evaluate_winogrande
+from eval_datasets.huggingface.hellaswag import evaluate_hellaswag
 from eval_datasets.huggingface.commonsense_qa import evaluate_commonsense_qa
 from eval_datasets.huggingface.logiqa import evaluate_logiqa
 
@@ -31,7 +33,9 @@ class DatasetRegistry:
             "mmlu": evaluate_mmlu,
             "commonsenseqa": evaluate_commonsense_qa,
             "logiqa": evaluate_logiqa,
-            "truthfulqa": evaluate_tiny_truthfulqa
+            "truthfulqa": evaluate_tiny_truthfulqa,
+            "winogrande": evaluate_winogrande,
+            "hellaswag": evaluate_hellaswag
         }
     
     def get_evaluator(self, eval_type: str) -> Callable:

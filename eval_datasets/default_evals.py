@@ -105,5 +105,21 @@ default_datasets_to_run = [
     "split": None,
     "seed": None,
     "sample_size": None
-  }
+  },
+  {
+    "eval_type": "winogrande",
+    "dataset_path": "tinyBenchmarks/tinyWinogrande",
+    "dataset_name": "tinyWinogrande",
+    "split": None,
+    "seed": None,
+    "sample_size": None
+  },
+  {
+    "eval_type": "hellaswag",
+    "dataset_path": "tinyBenchmarks/tinyHellaswag",
+    "dataset_name": "tinyHellaswag",
+    "split": None,
+    "seed": None,
+    "sample_size": None
+  }    
 ]
