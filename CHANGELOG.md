@@ -16,6 +16,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - 
 
+## [0.8.0] - 2025-01-21
+
+### Added
+- **Model Accuracy Summary CSV (`model_accuracy_summary.csv`)**:
+  - Comparative summary report across all evaluated models with dynamic columns
+  - Automatically generated/updated after each model evaluation  
+  - One row per model with accuracy results for each dataset evaluated
+  - Includes overall accuracy, execution time, and average tokens per second
+  - Handles models evaluated on different dataset subsets gracefully
+  - Preserves historical results across multiple evaluation runs
+  - Dynamic column generation based on datasets encountered across all models
+- **Enhanced Reporting Workflow**: Users now get both detailed per-dataset results (`evaluation_summary.csv`) and comparative model summaries (`model_accuracy_summary.csv`)
+- **Comprehensive Unit Tests**: Full test coverage for model accuracy summary functionality with 6 test methods
+- **Demo Script**: Added `examples/demo_model_summary.py` to demonstrate the new feature
+- **Documentation Updates**: Updated README.md with model accuracy summary format and usage examples
+
+### Changed
+- **Improved CSV Output**: StudioEval now generates two complementary CSV reports for better analysis workflows
+- **Enhanced Model Comparison**: Easy comparison of model performance across different datasets
+
 ## [0.7.0] - 2025-01-21
 
 ### Added
@@ -114,7 +134,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Performance metrics and timing statistics
 - Reproducible evaluations with seed support
 
-[Unreleased]: https://github.com/davealaw/StudioEval/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/davealaw/StudioEval/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/davealaw/StudioEval/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/davealaw/StudioEval/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/davealaw/StudioEval/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/davealaw/StudioEval/releases/tag/v0.5.0

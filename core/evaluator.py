@@ -6,6 +6,7 @@ import csv
 import json
 import time
 import logging
+import os
 from typing import List, Dict, Any, Optional
 
 from interfaces.model_client import EvaluationResult
@@ -172,8 +173,19 @@ class EvaluationOrchestrator:
                 logger.info(f"✅ {result['dataset']} accuracy: {result['accuracy']}% ({result['correct']}/{result['total']})")
                 logger.info(f"📊 {result['dataset']} average response tokens/sec: {result['tok_per_sec']:.2f}\n")
         
+        # Calculate metrics for summaries
+        elapsed_time = time.time() - start_time
+        avg_tokens_per_sec = total_tokens_per_sec / len(results) if results else 0.0
+        
         # Save results and log summary
         self._save_results(results)
+        self._save_model_accuracy_summary(
+            model_id=model_id,
+            results=results,
+            elapsed_time=elapsed_time,
+            avg_tokens_per_sec=avg_tokens_per_sec,
+            raw_duration=raw_duration
+        )
         self._log_evaluation_summary(
             model_id=model_id,
             results=results, 
@@ -415,3 +427,112 @@ class EvaluationOrchestrator:
         
         logger.info(f"📊 Overall accuracy: {overall_accuracy}%")
         logger.info(f"📊 Overall average response tokens per second: {avg_tokens_per_sec:.2f}")
+    
+    def _save_model_accuracy_summary(self, 
+                                   model_id: str,
+                                   results: List[Dict[str, Any]], 
+                                   elapsed_time: float,
+                                   avg_tokens_per_sec: float,
+                                   raw_duration: bool = False) -> None:
+        """Save or update model accuracy summary CSV with dynamic columns."""
+        if not results:
+            return
+        
+        # Calculate overall accuracy
+        total_correct = sum(r['correct'] for r in results)
+        total_questions = sum(r['total'] for r in results)
+        overall_accuracy = round((total_correct / total_questions * 100), 2) if total_questions > 0 else 0.0
+        
+        # Format duration
+        if raw_duration:
+            time_str = f"{elapsed_time:.2f}s"
+        else:
+            time_str = format_duration(elapsed_time)
+        
+        # Load existing data or create new structure
+        model_summary_file = "model_accuracy_summary.csv"
+        existing_data = self._load_existing_model_summary(model_summary_file)
+        
+        # Prepare new model row
+        model_row = {
+            'model': model_id,
+            'overall': overall_accuracy,
+            'time': time_str,
+            'tokens': round(avg_tokens_per_sec, 2)
+        }
+        
+        # Add dataset accuracies
+        for result in results:
+            model_row[result['dataset']] = result['accuracy']
+        
+        # Update existing data or add new model
+        self._update_model_summary_data(existing_data, model_row)
+        
+        # Save updated data
+        self._write_model_summary_csv(model_summary_file, existing_data)
+        
+        logger.info(f"📄 Model accuracy summary updated in {model_summary_file}")
+    
+    def _load_existing_model_summary(self, file_path: str) -> Dict[str, Any]:
+        """Load existing model accuracy summary data."""
+        if not os.path.exists(file_path):
+            return {'models': [], 'all_datasets': set()}
+        
+        try:
+            with open(file_path, 'r', newline='') as csvfile:
+                reader = csv.DictReader(csvfile)
+                models = list(reader)
+                
+                # Extract all dataset columns (excluding fixed columns)
+                fixed_cols = {'model', 'overall', 'time', 'tokens'}
+                all_datasets = set()
+                
+                if models:
+                    all_datasets = set(reader.fieldnames) - fixed_cols
+                
+                return {'models': models, 'all_datasets': all_datasets}
+        except Exception as e:
+            logger.warning(f"Could not read existing model summary file: {e}")
+            return {'models': [], 'all_datasets': set()}
+    
+    def _update_model_summary_data(self, existing_data: Dict[str, Any], new_model_row: Dict[str, Any]) -> None:
+        """Update existing data with new model results."""
+        # Update the set of all datasets
+        model_datasets = set(new_model_row.keys()) - {'model', 'overall', 'time', 'tokens'}
+        existing_data['all_datasets'].update(model_datasets)
+        
+        # Check if model already exists and update or append
+        model_id = new_model_row['model']
+        existing_model_idx = None
+        
+        for i, existing_model in enumerate(existing_data['models']):
+            if existing_model.get('model') == model_id:
+                existing_model_idx = i
+                break
+        
+        if existing_model_idx is not None:
+            # Update existing model data
+            existing_data['models'][existing_model_idx].update(new_model_row)
+        else:
+            # Add new model
+            existing_data['models'].append(new_model_row)
+    
+    def _write_model_summary_csv(self, file_path: str, data: Dict[str, Any]) -> None:
+        """Write model summary data to CSV with dynamic columns."""
+        if not data['models']:
+            return
+        
+        # Sort datasets alphabetically for consistent column order
+        dataset_columns = sorted(data['all_datasets'])
+        
+        # Define column order: model, datasets (alphabetical), overall, time, tokens
+        fieldnames = ['model'] + dataset_columns + ['overall', 'time', 'tokens']
+        
+        with open(file_path, 'w', newline='') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            writer.writeheader()
+            
+            # Write each model row, filling missing dataset columns with empty strings
+            for model_data in data['models']:
+                row = {col: model_data.get(col, '') for col in fieldnames}
+                writer.writerow(row)

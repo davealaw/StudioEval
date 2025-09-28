@@ -75,6 +75,7 @@ pids
 
 # Output files (root level output files, not data files)
 evaluation_summary.csv
+model_accuracy_summary.csv
 mock.jsonl
 *.tmp
 *.temp

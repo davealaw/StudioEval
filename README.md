@@ -247,12 +247,30 @@ StudioEval provides detailed evaluation results:
 ```
 
 ### CSV Output
-Results are automatically saved to `evaluation_summary.csv`:
+
+StudioEval generates two types of CSV reports:
+
+#### Dataset Results (`evaluation_summary.csv`)
+Detailed per-dataset results for the most recent evaluation:
 
 | dataset | correct | total | skipped | accuracy | tok_per_sec |
 |---------|---------|-------|---------|----------|-------------|
 | tinyMMLU | 326 | 500 | 0 | 65.2 | 42.5 |
 | tinyGSM8k | 369 | 500 | 0 | 73.8 | 38.2 |
+
+#### Model Accuracy Summary (`model_accuracy_summary.csv`)
+Comparative summary across all evaluated models with dynamic columns:
+
+| model | commonsenseqa | grammar | tinyMMLU | overall | time | tokens |
+|-------|---------------|---------|----------|---------|------|---------|
+| llama-3-8b | 85.0 | 82.0 | 65.2 | 77.4 | 4m 23s | 40.35 |
+| mistral-7b | 83.5 | 84.0 | 70.1 | 79.2 | 3m 15s | 45.2 |
+
+The model summary CSV:
+- Updates automatically after each model evaluation
+- Includes dynamic columns for all datasets evaluated across any model
+- Preserves historical results across multiple evaluation runs
+- Handles models evaluated on different dataset subsets
 
 ## 🧪 Testing
 
