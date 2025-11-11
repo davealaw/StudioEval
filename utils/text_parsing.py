@@ -67,11 +67,23 @@ def extract_corrected_text(text: str) -> str:
              If 'Corrected:' is not found, returns the original text stripped.
     """
     marker = "corrected:"
-    idx = text.lower().rfind(marker)
+    lower_text = text.lower()
+    idx = lower_text.rfind(marker)
     if idx != -1:
-        result = text[idx + len(marker):].strip()
-        return result
-    return text.strip()
+        result = text[idx + len(marker):]
+    else:
+        result = text
+
+    # Remove trailing sentinels, XML-like closing tags, and code fences
+    result = END_SENTINELS_RX.sub('', result)
+    result = re.sub(r'(?:</[^>]+>\s*)+$', '', result)
+    result = result.strip()
+
+    fence_match = CODE_FENCE_RX.match(result)
+    if fence_match:
+        result = fence_match.group(1).strip()
+
+    return result
 
 def normalize(text: str) -> str:
     """
@@ -90,6 +102,68 @@ def normalize(text: str) -> str:
     text = text.replace("…", "...").replace("–", "-").replace("—", "-")
     text = text.replace("\u00A0", " ")
     return text.strip().lower()
+
+# Style variants for tolerant matching
+
+CONTRACTIONS = [
+    (r"\bhe's\b", "he is"), (r"\bshe's\b", "she is"),
+    (r"\bcan't\b", "cannot"), (r"\bwon't\b", "will not"),
+    (r"\bit's\b", "it is"), (r"\bthey're\b", "they are"),
+]
+
+def expand_contractions(t: str) -> str:
+    for pat, repl in CONTRACTIONS:
+        t = re.sub(pat, repl, t)
+    return t
+
+def contract_some(t: str) -> str:
+    # light reverse of the above (optional)
+    t = re.sub(r"\bhe is\b", "he's", t)
+    t = re.sub(r"\bshe is\b", "she's", t)
+    t = re.sub(r"\bit is\b", "it's", t)
+    t = re.sub(r"\bthey are\b", "they're", t)
+    return t
+
+def canonicalize_style(t: str) -> set[str]:
+    """Return a set of benign variants for tolerant matching."""
+    t0 = normalize(t)
+    variants = {t0}
+
+    # whom -> who (modern)
+    v1 = re.sub(r"\bwhom\b", "who", t0)
+    variants.add(v1)
+
+    # a lot of <N>  <-> many <N>
+    variants |= {
+        re.sub(r"\ba lot of\b", "many", v) for v in list(variants)
+    }
+    variants |= {
+        re.sub(r"\bmany\b", "a lot of", v) for v in list(variants)
+    }
+
+    # whether <clause> <-> if <clause> (light)
+    variants |= {
+        re.sub(r"\bwhether\b", "if", v) for v in list(variants)
+    }
+    variants |= {
+        re.sub(r"\bif\b", "whether", v) for v in list(variants)
+    }
+
+    # contractions expanded/contracted
+    for v in list(variants):
+        variants.add(expand_contractions(v))
+        variants.add(contract_some(v))
+
+    return variants
+
+def is_accepted(expected: str, predicted: str) -> bool:
+    # strict match under base normalization
+    if normalize(expected) == normalize(predicted):
+        return True
+    # tolerant style-equivalence
+    if canonicalize_style(expected) & canonicalize_style(predicted):
+        return True
+    return False
 
 END_SENTINELS_RX = re.compile(r'(?:</s>|<\|endoftext\|>|<\|im_end\|>|<\|end\|>|<\|endofresponse\|>)\s*$', re.I)
 THINK_BLOCK_RX   = re.compile(r'<\s*(think|analysis|reasoning)\b[^>]*>.*?<\s*/\s*\1\s*>', re.I|re.S)

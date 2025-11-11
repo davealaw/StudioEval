@@ -3,7 +3,7 @@ import logging
 from tqdm import tqdm
 from models.model_handling import query_model
 from utils.data_loading import load_json_dataset_with_config
-from utils.text_parsing import extract_corrected_text, normalize, clean_llm_output
+from utils.text_parsing import extract_corrected_text, normalize, is_accepted
 
 logger = logging.getLogger(__name__)
 
@@ -50,12 +50,11 @@ def evaluate_grammar_dataset(model_id, jsonl_path="grammar_dataset.jsonl", datas
         model_output = model_output.strip()
         tokens_per_second_total += stats["tokens_per_second"]
 
-        model_output = clean_llm_output(model_output)
         logger.debug(f"Model Output: {model_output}")
 
         # Gather results
         predicted = extract_corrected_text(model_output).strip()
-        is_correct = normalize(predicted) == normalize(expected_answer)
+        is_correct = is_accepted(expected_answer, predicted)
         logger.debug(f"✅ Question {total + 1} - Expected: {normalize(expected_answer)}, Predicted: {normalize(predicted)} - {'Correct' if is_correct else 'Incorrect'}")  
 
         if is_correct:
