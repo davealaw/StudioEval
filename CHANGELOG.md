@@ -16,6 +16,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - 
 
+## [0.8.1] - 2025-11-11
+
+### Changed
+- `utils/text_parsing.py`: `extract_mcq_letter` now trims LM Studio control tokens, prefers the last explicit `Answer:` marker, and tolerates lightweight punctuation around the choice, while `extract_corrected_text` strips sentinel tags, XML fragments, and fenced blocks to return only the corrected sentence.
+- `eval_datasets/custom/grammar.py`: The grammar evaluator now routes responses through the shared parsing utilities, logs normalized comparisons, and scores with the tolerant `is_accepted` matcher to reduce false negatives for stylistic equivalents.
+
 ## [0.8.0] - 2025-01-21
 
 ### Added
@@ -134,7 +140,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Performance metrics and timing statistics
 - Reproducible evaluations with seed support
 
-[Unreleased]: https://github.com/davealaw/StudioEval/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/davealaw/StudioEval/compare/v0.8.1...HEAD
+[0.8.1]: https://github.com/davealaw/StudioEval/compare/v0.8.0...v0.8.1
 [0.8.0]: https://github.com/davealaw/StudioEval/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/davealaw/StudioEval/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/davealaw/StudioEval/compare/v0.5.0...v0.6.0
