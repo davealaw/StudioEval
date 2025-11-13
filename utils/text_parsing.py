@@ -101,9 +101,9 @@ def normalize(text: str) -> str:
         str: The normalized text
     """
     text = unicodedata.normalize("NFKC", text)
-    text = text.replace("’", "'").replace("‘", "'") #noqa: RUF001
+    text = text.replace("’", "'").replace("‘", "'")  # noqa: RUF001
     text = text.replace("“", '"').replace("”", '"')
-    text = text.replace("…", "...").replace("–", "-").replace("—", "-") #noqa: RUF001
+    text = text.replace("…", "...").replace("–", "-").replace("—", "-")  # noqa: RUF001
     text = text.replace("\u00a0", " ")
     return text.strip().lower()
 

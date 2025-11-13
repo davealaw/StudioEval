@@ -371,8 +371,9 @@ class TestEvaluatorCommonPatterns:
     def test_evaluators_handle_custom_dataset_names(self):
         """Test that evaluators accept custom dataset names."""
         with (
-            patch("eval_datasets.custom.grammar.load_json_dataset_with_config")
-            as mock_load,
+            patch(
+                "eval_datasets.custom.grammar.load_json_dataset_with_config"
+            ) as mock_load,
             patch("eval_datasets.custom.grammar.query_model"),
             patch("eval_datasets.custom.grammar.time.sleep"),
         ):
@@ -433,8 +434,9 @@ class TestEvaluatorErrorHandling:
     def test_evaluators_handle_empty_datasets(self):
         """Test evaluator behavior with empty datasets."""
         with (
-            patch("eval_datasets.custom.grammar.load_json_dataset_with_config")
-            as mock_load,
+            patch(
+                "eval_datasets.custom.grammar.load_json_dataset_with_config"
+            ) as mock_load,
             patch("eval_datasets.custom.grammar.query_model"),
         ):
             mock_load.return_value = []  # Empty dataset

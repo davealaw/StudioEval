@@ -275,7 +275,6 @@ class TestModelDatasetPipelineIntegration:
                 "eval_datasets.huggingface.gsm8k.evaluate_gsm8k_dataset"
             ) as mock_math,
         ):
-
             mock_grammar.return_value = {"dataset": "grammar_test", "accuracy": 80.0}
             mock_math.return_value = {"dataset": "math_test", "accuracy": 70.0}
 

@@ -44,7 +44,6 @@ def evaluate_commonsense_qa(
     tokens_per_second_total = 0
 
     for item in tqdm(dataset, desc=f"⏳ Evaluating {dataset_name}"):
-
         # Extract Question details
         correct_answer = None
         if "answerKey" in item:

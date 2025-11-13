@@ -122,7 +122,6 @@ class TestEnhancedEvaluationFlow:
             patch("builtins.open"),
             patch("time.sleep"),
         ):  # Mock sleep to avoid delays
-
             # Return different results for different models
             mock_eval.side_effect = [
                 {
@@ -196,7 +195,6 @@ class TestEnhancedEvaluationFlow:
             patch("builtins.open"),
             patch("time.sleep"),
         ):  # Mock sleep to avoid delays
-
             # Return different results for different dataset types
             mock_eval.side_effect = [
                 {
@@ -286,7 +284,6 @@ class TestErrorRecoveryScenarios:
             patch("builtins.open"),
             patch("time.sleep"),
         ):  # Mock sleep to avoid delays
-
             # First call succeeds, second call fails
             mock_eval.side_effect = [
                 {
@@ -402,7 +399,6 @@ class TestPerformanceScenarios:
             patch("builtins.open"),
             patch("time.sleep"),
         ):  # Mock sleep to avoid delays
-
             mock_eval.return_value = {
                 "dataset": "timing_test",
                 "correct": 1,

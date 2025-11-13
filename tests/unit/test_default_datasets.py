@@ -200,7 +200,8 @@ class TestDefaultDatasetValidation:
             try:
                 # Attempt to evaluate with minimal required parameters
                 registry.evaluate_dataset(
-                    model_id="test_model", **config  # Unpack the entire config
+                    model_id="test_model",
+                    **config,  # Unpack the entire config
                 )
 
                 # Verify the call was made
