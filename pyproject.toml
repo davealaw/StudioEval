@@ -5,18 +5,17 @@ description = "Lightweight LLM evaluation framework using LM Studio as the infer
 authors = [{ name = "Dave Law" }]
 license = "MIT"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
+dependencies = [
+    "requests>=2.25.0", 
+    "datasets>=2.0.0", 
+    "tqdm>=4.60.0", 
+    "numpy>=1.20.0", 
+    "scikit-learn>=1.0.0"
+]
 
 [project.scripts]
 studioeval = "studioeval:main"
-
-dependencies = [
-    "requests>=2.25.0",
-    "datasets>=2.0.0",
-    "tqdm>=4.60.0",
-    "numpy>=1.20.0",
-    "scikit-learn>=1.0.0"
-]
 
 [project.optional-dependencies]
 test = [
@@ -30,6 +29,8 @@ dev = [
     "pytest-cov>=4.0.0",
     "pytest-mock>=3.10.0",
     "hypothesis>=6.0.0",
+    "ruff>=0.6.0",
+    "mypy>=1.10.0",
 ]
 
 [tool.setuptools]
@@ -75,3 +76,40 @@ exclude_lines = [
     "raise NotImplementedError",
     "if __name__ == .__main__.:",
 ]
+
+[tool.ruff]
+line-length = 88
+target-version = "py39"
+extend-exclude = ["_archive/"]
+
+[tool.ruff.format]
+line-ending = "lf"
+quote-style = "double"
+indent-style = "space"
+
+[tool.ruff.lint]
+select = [
+    "E",
+    "F",
+    "I",
+    "N",
+    "UP",
+    "B",
+    "BLE",
+    "C4",
+    "SIM",
+    "RUF",
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["studioeval"]
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
+warn_unused_configs = true
+warn_redundant_casts = true
+warn_unreachable = true
+strict_optional = true
+exclude = "(^|/)__version__\\.py$|_archive/"
+explicit_package_bases = true

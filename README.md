@@ -350,6 +350,23 @@ Versioning follows [Semantic Versioning](https://semver.org):
 3. Review changes with `git diff`
 4. Commit, tag, and push
 
+### Code Quality & Formatting
+
+StudioEval relies on [Ruff](https://docs.astral.sh/ruff/) for both formatting and linting, plus `mypy` for type checking. Before sending a PR:
+
+```bash
+# Format the codebase (Black-compatible defaults)
+python3 -m ruff format .
+
+# Lint and auto-fix safe issues
+python3 -m ruff check --fix .
+
+# Type-check
+python3 -m mypy .
+```
+
+These commands keep contributions consistent without requiring a separate formatter.
+
 ## 🎯 Parameter Precedence
 
 StudioEval uses a clear parameter precedence system:

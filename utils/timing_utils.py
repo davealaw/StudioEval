@@ -1,7 +1,7 @@
 def format_duration(seconds: float) -> str:
     """
     Convert a duration in seconds to a human-readable string.
-    
+
     Args:
         seconds (float): Duration in seconds.
     Returns:
