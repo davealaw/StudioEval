@@ -47,9 +47,7 @@ class TestDatasetLoading:
         mock_dataset.__len__ = Mock(return_value=100)
         mock_load_dataset.return_value = mock_dataset
 
-        load_dataset_with_config(
-            "test_dataset", revision="refs/convert/parquet"
-        )
+        load_dataset_with_config("test_dataset", revision="refs/convert/parquet")
 
         mock_load_dataset.assert_called_once_with(
             "test_dataset", split="train", revision="refs/convert/parquet"

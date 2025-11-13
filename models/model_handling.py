@@ -6,6 +6,7 @@ from config.comm_config import get_comm_config
 
 logger = logging.getLogger(__name__)
 
+
 def _get_lmstudio_error_cls() -> type[Exception]:
     try:
         return lmstudio.LMStudioError  # type: ignore[attr-defined]

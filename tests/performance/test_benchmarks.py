@@ -120,7 +120,6 @@ class TestPerformanceBenchmarks:
                 patch("builtins.open"),
                 patch("time.sleep"),
             ):  # Mock sleep to avoid 2s delay per model
-
                 mock_eval.return_value = {
                     "dataset": "scaling_test",
                     "correct": 1,
@@ -234,7 +233,6 @@ class TestPerformanceBenchmarks:
             patch("builtins.open"),
             patch("time.sleep"),
         ):  # Mock sleep to avoid 2s delay per model
-
             mock_eval.return_value = {
                 "dataset": "memory_test",
                 "correct": 80,
@@ -348,7 +346,6 @@ class TestStressTests:
             patch("builtins.open"),
             patch("time.sleep"),
         ):  # Mock sleep to avoid 2s delay per model
-
             mock_eval.return_value = {
                 "dataset": "large_stress",
                 "correct": 800,
@@ -393,7 +390,6 @@ class TestStressTests:
             patch("builtins.open"),
             patch("time.sleep"),
         ):  # Mock sleep to avoid 2s delay per model
-
             mock_eval.return_value = {
                 "dataset": "rapid_test",
                 "correct": 1,
@@ -495,7 +491,6 @@ class TestResourceUtilization:
             patch("builtins.open"),
             patch("time.sleep"),
         ):  # Mock sleep to avoid delays
-
             mock_eval.return_value = {
                 "dataset": "cleanup_test",
                 "correct": 1,

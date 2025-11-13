@@ -146,7 +146,7 @@ class TestTextNormalization:
     def test_normalize_unicode_dashes(self):
         """Test Unicode dash normalization."""
         assert normalize("em—dash") == "em-dash"
-        assert normalize("en–dash") == "en-dash" #noqa: RUF001
+        assert normalize("en–dash") == "en-dash"  # noqa: RUF001
         assert normalize("ellipsis…") == "ellipsis..."
 
     def test_normalize_unicode_spaces(self):
@@ -166,7 +166,7 @@ class TestTextNormalization:
         [
             ("  Mixed   Spacing  ", "mixed   spacing"),
             ('Quote"Test"', 'quote"test"'),
-            ("Multiple—Different–Dashes", "multiple-different-dashes"), #noqa: RUF001
+            ("Multiple—Different–Dashes", "multiple-different-dashes"),  # noqa: RUF001
             ("", ""),
             ("NoChangesNeeded", "nochangesneeded"),
         ],

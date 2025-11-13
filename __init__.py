@@ -1,7 +1,8 @@
 """Expose the CLI helpers when importing `studioeval` as a package."""
 
-from importlib import import_module as _import_module
 import sys as _sys
+from contextlib import suppress
+from importlib import import_module as _import_module
 
 from .studioeval import exit, load_comm_config, main, setup_logging
 
@@ -23,7 +24,5 @@ for _alias in (
     "tests",
 ):
     if _alias not in _sys.modules:
-        try:
+        with suppress(ModuleNotFoundError):
             _sys.modules[_alias] = _import_module(f".{_alias}", __name__)
-        except ModuleNotFoundError:
-            pass

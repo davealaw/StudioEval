@@ -3,13 +3,15 @@ Unit tests for CLI entry point (studioeval.py).
 Tests argument parsing, error handling, and integration with orchestrator.
 """
 
+from importlib import import_module
 from io import StringIO
 from unittest.mock import Mock, patch
 
 import pytest
 
 import studioeval
-from studioeval import studioeval as cli_module
+
+cli_module = import_module("studioeval.studioeval")
 
 
 class TestCLIArgumentParsing:
@@ -148,9 +150,7 @@ class TestCLIArgumentParsing:
             studioeval.main()
 
             # Verify logging setup was called with correct parameters
-            mock_logging.assert_called_once_with(
-                log_level="DEBUG", log_file="test.log"
-            )
+            mock_logging.assert_called_once_with(log_level="DEBUG", log_file="test.log")
 
     def test_communication_config_argument(self):
         """Test communication config argument."""
