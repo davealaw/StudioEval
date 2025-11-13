@@ -1,25 +1,25 @@
 import json
 import logging
 from copy import deepcopy
-from typing import Any, Dict
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_CONFIG: Dict[str, Any] = {
+DEFAULT_CONFIG: dict[str, Any] = {
     "timeout": 180,  # seconds
     "GENERATION_PARAMS": {
         "temperature": 0.0,
         "topPSampling": 1.0,
         "topKSampling": 0,
         "repeatPenalty": 1.00,
-        "maxTokens": 2000 # default 512
-    }
+        "maxTokens": 2000,  # default 512
+    },
 }
 
-_config: Dict[str, Any] = deepcopy(DEFAULT_CONFIG)
+_config: dict[str, Any] = deepcopy(DEFAULT_CONFIG)
 
 
-def _validate(cfg: Dict[str, Any]) -> Dict[str, Any]:
+def _validate(cfg: dict[str, Any]) -> dict[str, Any]:
     """Validate and coerce types; fallback to defaults with warnings when invalid."""
     out = deepcopy(DEFAULT_CONFIG)
 
@@ -50,7 +50,9 @@ def _validate(cfg: Dict[str, Any]) -> Dict[str, Any]:
             if isinstance(v, (int, float)):
                 merged[k] = v
             else:
-                logger.warning(f"GENERATION_PARAMS['{k}'] must be numeric; keeping default.")
+                logger.warning(
+                    f"GENERATION_PARAMS['{k}'] must be numeric; keeping default."
+                )
         out["GENERATION_PARAMS"] = merged
 
     return out
@@ -63,7 +65,7 @@ def load_comm_config(path: str) -> None:
     """
     global _config
     try:
-        with open(path, "r") as f:
+        with open(path) as f:
             raw = json.load(f)
         _config = _validate(raw)
         logger.info(f"Loaded communication config from {path}.")
@@ -75,11 +77,13 @@ def load_comm_config(path: str) -> None:
             f"Invalid JSON in communication config '{path}': {e}. Using defaults."
         )
         _config = deepcopy(DEFAULT_CONFIG)
-    except Exception as e:
-        logger.warning(f"Failed to load communication config '{path}': {e}. Using defaults.")
+    except (OSError, TypeError, ValueError) as e:
+        logger.warning(
+            f"Failed to load communication config '{path}': {e}. Using defaults."
+        )
         _config = deepcopy(DEFAULT_CONFIG)
 
 
-def get_comm_config() -> Dict[str, Any]:
+def get_comm_config() -> dict[str, Any]:
     """Return the effective, validated config (defaults if not loaded)."""
     return deepcopy(_config)

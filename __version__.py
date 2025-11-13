@@ -1,4 +1,4 @@
 """StudioEval version information."""
 
-__version__ = "0.8.1"
-__version_info__ = tuple(int(i) for i in __version__.split('.'))
+__version__ = "0.8.2"
+__version_info__ = tuple(int(i) for i in __version__.split("."))

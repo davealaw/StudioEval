@@ -1,6 +1,7 @@
 import logging
+from typing import Optional
+
 from datasets import load_dataset
-from typing import Optional, Union
 
 logger = logging.getLogger(__name__)
 
@@ -11,31 +12,40 @@ DEFAULT_SEED = 42
 def _apply_sampling(dataset, sample_size: int, seed: Optional[int] = None):
     """
     Apply sampling to a dataset if sample_size > 0.
-    
+
     Args:
         dataset: The dataset to sample from
         sample_size (int): Number of samples to select; 0 means full dataset
         seed (int, optional): Seed for shuffling
-        
+
     Returns:
         Dataset: Sampled dataset or original if sample_size <= 0
     """
     if sample_size <= 0:
         return dataset
-        
+
     if sample_size > len(dataset):
-        logger.warning(f"⚠️ sample_size={sample_size} exceeds dataset size ({len(dataset)}). Using full dataset.")
+        logger.warning(
+            "⚠️ sample_size=%s exceeds dataset size (%s). Using full dataset.",
+            sample_size,
+            len(dataset),
+        )
         return dataset
-    
+
     if seed is None:
         seed = DEFAULT_SEED
-        
+
     return dataset.shuffle(seed=seed).select(range(sample_size))
 
 
-def load_dataset_with_config(dataset_path: str, subset: Optional[str] = None, 
-                            split: str = "train", seed: Optional[int] = None, 
-                            sample_size: int = 0, revision: Optional[str] = None):
+def load_dataset_with_config(
+    dataset_path: str,
+    subset: Optional[str] = None,
+    split: str = "train",
+    seed: Optional[int] = None,
+    sample_size: int = 0,
+    revision: Optional[str] = None,
+):
     """
     Load a dataset from Hugging Face with optional configuration.
 
@@ -49,7 +59,7 @@ def load_dataset_with_config(dataset_path: str, subset: Optional[str] = None,
 
     Returns:
         Dataset: A Hugging Face Dataset object
-        
+
     Raises:
         Exception: If dataset loading fails
     """
@@ -63,12 +73,15 @@ def load_dataset_with_config(dataset_path: str, subset: Optional[str] = None,
         dataset = load_dataset(dataset_path, **load_args)
         return _apply_sampling(dataset, sample_size, seed)
     except Exception as e:
-        logger.error(f"Failed to load dataset '{dataset_path}': {type(e).__name__}: {e}")
+        logger.error(
+            f"Failed to load dataset '{dataset_path}': {type(e).__name__}: {e}"
+        )
         raise
 
 
-def load_json_dataset_with_config(jsonl_path: str, seed: Optional[int] = None, 
-                                 sample_size: int = 0):
+def load_json_dataset_with_config(
+    jsonl_path: str, seed: Optional[int] = None, sample_size: int = 0
+):
     """
     Load a dataset from a local JSONL file.
 
@@ -79,7 +92,7 @@ def load_json_dataset_with_config(jsonl_path: str, seed: Optional[int] = None,
 
     Returns:
         Dataset: A Hugging Face Dataset object
-        
+
     Raises:
         Exception: If dataset loading fails
     """
@@ -87,5 +100,7 @@ def load_json_dataset_with_config(jsonl_path: str, seed: Optional[int] = None,
         dataset = load_dataset("json", data_files=jsonl_path, split="train")
         return _apply_sampling(dataset, sample_size, seed)
     except Exception as e:
-        logger.error(f"Failed to load JSON dataset from '{jsonl_path}': {type(e).__name__}: {e}")
+        logger.error(
+            f"Failed to load JSON dataset from '{jsonl_path}': {type(e).__name__}: {e}"
+        )
         raise

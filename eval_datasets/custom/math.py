@@ -1,15 +1,26 @@
-import time
 import logging
+import time
+
 from tqdm import tqdm
+
+from models.model_handling import query_model
 from utils.data_loading import load_json_dataset_with_config
 from utils.text_parsing import extract_numeric_answer
-from models.model_handling import query_model
 
 logger = logging.getLogger(__name__)
 
-def evaluate_math_dataset(model_id, jsonl_path="elementary_math_dataset.jsonl", dataset_name="basic math", seed=42, sample_size=0, sleep=True, **kwargs):
+
+def evaluate_math_dataset(
+    model_id,
+    jsonl_path="elementary_math_dataset.jsonl",
+    dataset_name="basic math",
+    seed=42,
+    sample_size=0,
+    sleep=True,
+    **kwargs,
+):
     """
-    Evaluate a custom exact answer math dataset with the model. 
+    Evaluate a custom exact answer math dataset with the model.
 
     Args:
         model_id (str): Identifier for the model to query.
@@ -19,12 +30,14 @@ def evaluate_math_dataset(model_id, jsonl_path="elementary_math_dataset.jsonl", 
         sample_size (int): Number of samples to evaluate, 0 means all.
         sleep (bool): Whether to include sleep delay between items (default True).
         **kwargs: Additional keyword arguments.
-    
+
     Returns:
         dict: Evaluation results including accuracy and tokens per second.
     """
-    dataset = load_json_dataset_with_config(jsonl_path, seed=seed, sample_size=sample_size)        
-  
+    dataset = load_json_dataset_with_config(
+        jsonl_path, seed=seed, sample_size=sample_size
+    )
+
     total = 0
     correct = 0
     skipped = 0
@@ -41,20 +54,22 @@ def evaluate_math_dataset(model_id, jsonl_path="elementary_math_dataset.jsonl", 
 
         # Construct simple math prompt
         full_prompt = (
-            "Solve the following math problem. Return only the final numeric answer prefixed with 'Answer:'. "
-            "Do not explain your steps.\n\n"
+            "Solve the following math problem. Return only the final numeric "
+            "answer prefixed with 'Answer:'. Do not explain your steps.\n\n"
             f"Problem: {question}\nAnswer:"
         )
 
         # Query model
-        model_output, stats = query_model(full_prompt, model_key=model_id, current = total)
+        model_output, stats = query_model(
+            full_prompt, model_key=model_id, current=total
+        )
         model_output = model_output.strip()
         tokens_per_second_total += stats["tokens_per_second"]
 
         # Gather results
         try:
             predicted = extract_numeric_answer(model_output)
-            
+
             try:
                 expected = float(expected_answer)
             except (TypeError, ValueError):
@@ -66,11 +81,20 @@ def evaluate_math_dataset(model_id, jsonl_path="elementary_math_dataset.jsonl", 
                 is_correct = abs(predicted - expected) < 1e-3  # Tolerance for rounding
 
             if not is_correct:
-                logger.debug(f"❌ Incorrect answer for question '{question}': expected {expected}, got {predicted}")
+                logger.debug(
+                    "❌ Incorrect answer for question '%s': expected %s, got %s",
+                    question,
+                    expected,
+                    predicted,
+                )
 
         except ValueError:
             is_correct = False  # Model didn't return a parseable number
-            logger.debug(f"⚠️ Invalid number format from model: '{predicted}' for question '{question}'")
+            logger.debug(
+                "⚠️ Invalid number format from model: '%s' for question '%s'",
+                predicted,
+                question,
+            )
 
         if is_correct:
             correct += 1
@@ -85,5 +109,5 @@ def evaluate_math_dataset(model_id, jsonl_path="elementary_math_dataset.jsonl", 
         "total": total,
         "skipped": skipped,
         "accuracy": round((correct / total * 100), 2) if total > 0 else 0.0,
-        "tok_per_sec": tokens_per_second_total / total if total > 0 else 0
+        "tok_per_sec": tokens_per_second_total / total if total > 0 else 0,
     }

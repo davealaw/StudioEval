@@ -1,17 +1,28 @@
 # hellaswag.py
-import time
 import logging
+import time
+
 from tqdm import tqdm
+
 from models.model_handling import query_model
 from utils.data_loading import load_dataset_with_config
 from utils.text_parsing import extract_letter
 
 logger = logging.getLogger(__name__)
 
-def evaluate_hellaswag(model_id, dataset_path="tinyBenchmarks/tinyHellaswag", dataset_name="tinyHellaSwag", subset=None, split="validation", seed=42, sample_size=0):
+
+def evaluate_hellaswag(
+    model_id,
+    dataset_path="tinyBenchmarks/tinyHellaswag",
+    dataset_name="tinyHellaSwag",
+    subset=None,
+    split="validation",
+    seed=42,
+    sample_size=0,
+):
     """
     Evaluate HellaSwag dataset with a language model.
-    
+
     HellaSwag tests commonsense reasoning by asking models to choose the most
     likely continuation of a given context from 4 options. It requires models
     to understand everyday scenarios and predict plausible next steps.
@@ -31,7 +42,7 @@ def evaluate_hellaswag(model_id, dataset_path="tinyBenchmarks/tinyHellaswag", da
         subset (str): Optional subset of the dataset to evaluate.
         split (str): Dataset split to evaluate (default is "validation").
         seed (int): Random seed for reproducibility.
-        sample_size (int): Number of samples to evaluate, 0 means all. 
+        sample_size (int): Number of samples to evaluate, 0 means all.
 
     Returns:
         dict: Evaluation results including accuracy and tokens per second.
@@ -51,39 +62,48 @@ def evaluate_hellaswag(model_id, dataset_path="tinyBenchmarks/tinyHellaswag", da
             ctx = str(item.get("ctx", "")).strip()
             endings = item.get("endings", [])
             raw_label = item.get("label", None)
-            
-            if not ctx or not isinstance(endings, list) or len(endings) < 2 or raw_label is None:
+
+            if (
+                not ctx
+                or not isinstance(endings, list)
+                or len(endings) < 2
+                or raw_label is None
+            ):
                 skipped += 1
                 continue
-                
+
             # HellaSwag is 4-way; we keep generic in case of variants
             n_choices = len(endings)
-            
-            # Handle both string and int labels more robustly (HellaSwag uses string labels)
+
+            # Handle string or int labels (HellaSwag typically uses strings)
             try:
                 label = int(raw_label)
             except (ValueError, TypeError):
                 logger.debug(f"Invalid label format: {raw_label}, skipping item")
                 skipped += 1
                 continue
-                
+
             # Ensure label is within valid range
             if not (0 <= label < n_choices):
-                logger.debug(f"Label {label} out of range for {n_choices} choices, skipping item")
+                logger.debug(
+                    f"Label {label} out of range for {n_choices} choices, skipping item"
+                )
                 skipped += 1
                 continue
-                
-        except Exception as e:
+
+        except (KeyError, TypeError, ValueError) as e:
             logger.debug(f"Error processing item: {e}, skipping")
             skipped += 1
             continue
 
         # ---- Expected answer as a letter (A,B,C,...) ----
-        expected_letter = chr(ord('A') + label)
+        expected_letter = chr(ord("A") + label)
 
         # ---- Format choices as "A. ..., B. ..., ..." ----
-        letters = [chr(ord('A') + i) for i in range(n_choices)]
-        formatted_choices = "  ".join(f"{letters[i]}. {str(endings[i]).strip()}" for i in range(n_choices))
+        letters = [chr(ord("A") + i) for i in range(n_choices)]
+        formatted_choices = "  ".join(
+            f"{letters[i]}. {str(endings[i]).strip()}" for i in range(n_choices)
+        )
 
         # ---- Deterministic, short prompt (matches your style/parsers) ----
         full_prompt = (
@@ -95,14 +115,21 @@ def evaluate_hellaswag(model_id, dataset_path="tinyBenchmarks/tinyHellaswag", da
         )
 
         # ---- Query model ----
-        model_output, stats = query_model(full_prompt, model_key=model_id, current=total)
+        model_output, stats = query_model(
+            full_prompt, model_key=model_id, current=total
+        )
         tokens_per_second_total += stats.get("tokens_per_second", 0.0)
 
         # ---- Parse model letter and score ----
         predicted = extract_letter(model_output)  # expects a single letter like A/B/C/D
-        is_correct = (predicted == expected_letter)
-        logger.debug(f"✅ Question {total + 1} - Expected: {expected_letter}, Predicted: {predicted} - {'Correct' if is_correct else 'Incorrect'}")
-
+        is_correct = predicted == expected_letter
+        logger.debug(
+            "✅ Question %s - Expected: %s, Predicted: %s - %s",
+            total + 1,
+            expected_letter,
+            predicted,
+            "Correct" if is_correct else "Incorrect",
+        )
 
         if is_correct:
             correct += 1

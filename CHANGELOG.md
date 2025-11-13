@@ -16,6 +16,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - 
 
+## [0.8.2] - 2025-11-12
+
+### Added
+- `.pre-commit-config.yaml` enforcing `ruff-format`, `ruff --fix`, `mypy`, and `pytest` so code-quality checks run automatically before every commit.
+
+### Changed
+- Codebase updated to satisfy the new Ruff formatting/lint rules and mypy typing checks, touching CLI glue (`studioeval.py`, `__init__.py`) and supporting tests.
+- Unit tests now patch the CLI module directly, keeping mocking stable after the package rename and ensuring lint/type tooling passes.
+
 ## [0.8.1] - 2025-11-11
 
 ### Changed
@@ -42,7 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Improved CSV Output**: StudioEval now generates two complementary CSV reports for better analysis workflows
 - **Enhanced Model Comparison**: Easy comparison of model performance across different datasets
 
-## [0.7.0] - 2025-01-21
+## [0.7.0] - 2025-09-20
 
 ### Added
 - **Comprehensive Unit Tests for HellaSwag Evaluator**:
@@ -79,7 +88,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Enhanced Error Handling Testing**: Comprehensive coverage of malformed data, network issues, and parsing failures
 - **Test Pattern Consistency**: New tests follow established patterns and conventions from existing evaluator tests
 
-## [0.6.0] - 2025-01-11
+## [0.6.0] - 2025-08-11
 
 ### Added
 - **Comprehensive Unit Tests for CommonsenseQA Evaluator**:
@@ -114,7 +123,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Better Error Recovery**: Enhanced malformed data handling in both evaluators
 - Removed 'skip' command line option as no longer relevant
 
-## [0.5.0] - 2025-01-10
+## [0.5.0] - 2025-08-10
 
 ### Added
 - Initial release of StudioEval
@@ -140,7 +149,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Performance metrics and timing statistics
 - Reproducible evaluations with seed support
 
-[Unreleased]: https://github.com/davealaw/StudioEval/compare/v0.8.1...HEAD
+[Unreleased]: https://github.com/davealaw/StudioEval/compare/v0.8.2...HEAD
+[0.8.2]: https://github.com/davealaw/StudioEval/compare/v0.8.1...v0.8.2
 [0.8.1]: https://github.com/davealaw/StudioEval/compare/v0.8.0...v0.8.1
 [0.8.0]: https://github.com/davealaw/StudioEval/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/davealaw/StudioEval/compare/v0.6.0...v0.7.0

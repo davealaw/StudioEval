@@ -3,6 +3,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 def load_model_set_file(path: str):
     """
     Returns a list of model IDs from a file.
@@ -11,21 +12,21 @@ def load_model_set_file(path: str):
     - JSON: either {"models": [...]} or a top-level JSON list ["id1", "id2"]
 
     If the file is not found or has invalid content, returns an empty list.
-    
+
     Args:
         path (str): Path to the model set file.
-    
+
     Returns:
         list: List of model IDs as strings.
-    
+
     Raises:
         FileNotFoundError: If the file does not exist.
         json.JSONDecodeError: If the JSON content is invalid.
-    
+
     Example:
         load_model_set_file("models.txt")
         load_model_set_file("models.json")
-    
+
     Example:
         # models.txt
         model1
@@ -36,16 +37,23 @@ def load_model_set_file(path: str):
         ["model1", "model2"]
     """
     try:
-        with open(path, "r") as f:
+        with open(path) as f:
             text = f.read().strip()
         # JSON?
         if path.endswith(".json"):
             data = json.loads(text)
-            if isinstance(data, dict) and "models" in data and isinstance(data["models"], list):
+            if (
+                isinstance(data, dict)
+                and "models" in data
+                and isinstance(data["models"], list)
+            ):
                 return [str(m).strip() for m in data["models"] if str(m).strip()]
             if isinstance(data, list):
                 return [str(m).strip() for m in data if str(m).strip()]
-            logger.error("Invalid JSON structure in model-set file. Use {'models': [...]} or a JSON list.")
+            logger.error(
+                "Invalid JSON structure in model-set file. Use "
+                "{'models': [...]} or a JSON list."
+            )
             return []
         # Plain text
         lines = [ln.strip() for ln in text.splitlines()]
