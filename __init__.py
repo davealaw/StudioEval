@@ -6,7 +6,7 @@ from importlib import import_module as _import_module
 
 from .studioeval import exit, load_comm_config, main, setup_logging
 
-__all__ = ("main", "setup_logging", "load_comm_config", "exit")
+__all__ = ("exit", "load_comm_config", "main", "setup_logging")
 
 # When the repository root is treated as the `studioeval` package (common in
 # local development), absolute imports like `import core` would normally fail

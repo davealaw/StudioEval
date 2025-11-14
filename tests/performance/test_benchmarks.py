@@ -284,7 +284,7 @@ class TestPerformanceBenchmarks:
         # Measure response times for multiple queries
         for i in range(100):
             start_time = time.time()
-            response, stats = model_manager.query_model(f"Test query {i}", model_name)
+            _response, _stats = model_manager.query_model(f"Test query {i}", model_name)
             end_time = time.time()
 
             response_times.append(end_time - start_time)
@@ -446,7 +446,7 @@ class TestResourceUtilization:
             try:
                 for i in range(10):
                     model_name = f"perf-model-{(thread_id * 10 + i) % 20:03d}"
-                    response, stats = model_manager.query_model(
+                    response, _stats = model_manager.query_model(
                         f"Thread {thread_id} query {i}", model_name
                     )
                     results.append((thread_id, i, len(response)))

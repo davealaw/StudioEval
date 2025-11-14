@@ -303,7 +303,7 @@ class TestGSM8KEvaluator:
         mock_dataset = [
             {
                 "question": (
-                    "Tom has 5 apples. He gives 2 away. " "How many does he have left?"
+                    "Tom has 5 apples. He gives 2 away. How many does he have left?"
                 ),
                 "answer": "#### 3",  # GSM8K format includes ####
             }
@@ -615,7 +615,7 @@ class TestTruthfulQAItemPreparation:
         result = prepare_mc1_item(item, shuffle=False)
 
         assert result is not None
-        question, choices_block, letters, expected_letter = result
+        _question, choices_block, _letters, expected_letter = result
 
         assert expected_letter == "A"  # First option assumed correct
         assert "A. First" in choices_block
@@ -631,7 +631,7 @@ class TestTruthfulQAItemPreparation:
         result = prepare_mc1_item(item, shuffle=False)
 
         assert result is not None
-        question, choices_block, letters, expected_letter = result
+        _question, _choices_block, _letters, expected_letter = result
 
         assert expected_letter == "B"  # Second option (index 1)
 
@@ -685,7 +685,7 @@ class TestTruthfulQAItemPreparation:
         result = prepare_mc1_item(item, shuffle=False)
 
         assert result is not None
-        question, choices_block, letters, expected_letter = result
+        _question, choices_block, letters, expected_letter = result
 
         assert letters == "ABCDE"
         assert expected_letter == "E"
@@ -2071,7 +2071,7 @@ class TestWinoGrandeEvaluator:
             },
             {
                 "sentence": (
-                    "Joan made sure to thank Susan for all the help she had " "given _."
+                    "Joan made sure to thank Susan for all the help she had given _."
                 ),
                 "option1": "Joan",
                 "option2": "Susan",
