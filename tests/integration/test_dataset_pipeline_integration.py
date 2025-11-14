@@ -4,6 +4,7 @@ Tests the interaction between dataset registry, evaluators, and data loading.
 """
 
 import json
+from pathlib import Path
 from unittest.mock import patch
 
 import pytest
@@ -44,16 +45,33 @@ class TestDatasetRegistryIntegration:
             evaluator = registry.get_evaluator(eval_type)
             assert callable(evaluator), f"Evaluator for {eval_type} should be callable"
 
-    def test_registry_evaluation_dispatch(self, dataset_pipeline_client):
+    @patch("eval_datasets.custom.grammar.query_model")
+    @patch("eval_datasets.custom.grammar.load_json_dataset_with_config")
+    def test_registry_evaluation_dispatch(
+        self, mock_load_dataset, mock_query_model, dataset_pipeline_client
+    ):
         """Test evaluation dispatch through registry."""
         registry = DatasetRegistry()
+
+        fixtures_dir = Path(__file__).resolve().parent.parent / "fixtures" / "data"
+        dataset_path = fixtures_dir / "mock_grammar_dataset.jsonl"
+        mock_load_dataset.return_value = [
+            {
+                "question": "Fix: he go to store.",
+                "answer": "Corrected: He goes to the store.",
+            }
+        ]
+        mock_query_model.return_value = (
+            "Corrected: Test",
+            {"tokens_per_second": 10.0},
+        )
 
         # Dispatch should use the real client but still complete without
         # hanging.
         result = registry.evaluate_dataset(
             eval_type="grammar",
             model_id="test-model",
-            dataset_path="mock.jsonl",
+            dataset_path=str(dataset_path),
             dataset_name="test_grammar",
         )
 
