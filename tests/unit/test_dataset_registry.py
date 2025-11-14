@@ -212,9 +212,9 @@ class TestDatasetRegistryIntegration:
             sig = inspect.signature(evaluator)
             params = list(sig.parameters.keys())
             assert len(params) > 0, f"Evaluator {eval_type} has no parameters"
-            assert (
-                params[0] == "model_id"
-            ), f"Evaluator {eval_type} first param is not 'model_id'"
+            assert params[0] == "model_id", (
+                f"Evaluator {eval_type} first param is not 'model_id'"
+            )
 
     @patch("core.dataset_registry.evaluate_grammar_dataset")
     def test_registry_uses_actual_imports(self, mock_grammar_eval):

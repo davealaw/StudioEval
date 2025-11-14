@@ -111,7 +111,7 @@ class TestModelManagerClientIntegration:
 
         # But queries should still work because the MockClient does not fail
         # when the server is down. Real clients would error in this case.
-        response, _ = manager.query_model("Test", "test-model")
+        _response, _ = manager.query_model("Test", "test-model")
         # For mock client, it still returns responses
 
     def test_manager_model_loading_integration(self, basic_mock_client):
@@ -189,7 +189,7 @@ class TestClientCommunicationProtocols:
         manager = ModelManager(advanced_mock_client)
 
         # Query model and check metrics
-        response, stats = manager.query_model("Performance test", "fast-model")
+        _response, stats = manager.query_model("Performance test", "fast-model")
 
         # Required metrics
         assert "tokens_per_second" in stats
@@ -266,7 +266,7 @@ class TestClientFailureRecovery:
 
         # But individual queries should still work if model is already loaded
         advanced_mock_client.current_model = "test-model"
-        response, _ = manager.query_model("Test", "test-model")
+        _response, _ = manager.query_model("Test", "test-model")
         # Should still work as query doesn't depend on list_models
 
 

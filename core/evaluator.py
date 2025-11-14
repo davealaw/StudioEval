@@ -322,13 +322,13 @@ class EvaluationOrchestrator:
         if not isinstance(config, dict):
             logger.error(
                 "❌ Dataset configuration "
-                f"#{index+1} must be an object, "
+                f"#{index + 1} must be an object, "
                 f"got {type(config).__name__}: {source}"
             )
             logger.error(
                 '💡 Expected: { "eval_type": "arc", "dataset_path": "...", ... }'
             )
-            raise ValueError(f"Dataset config #{index+1} must be a dictionary")
+            raise ValueError(f"Dataset config #{index + 1} must be a dictionary")
 
         # Check required fields
         required_fields = ["eval_type", "dataset_path", "dataset_name"]
@@ -337,7 +337,7 @@ class EvaluationOrchestrator:
         if missing_fields:
             logger.error(
                 "❌ Dataset configuration "
-                f"#{index+1} missing required fields: {missing_fields}"
+                f"#{index + 1} missing required fields: {missing_fields}"
             )
             logger.error(f"   Available fields: {list(config.keys())}")
             logger.error(f"💡 Required fields: {required_fields}")
@@ -351,7 +351,7 @@ class EvaluationOrchestrator:
             logger.error("   }")
             raise ValueError(
                 "Missing required fields in dataset config "
-                f"#{index+1}: {missing_fields}"
+                f"#{index + 1}: {missing_fields}"
             )
 
         # Check eval_type is supported
@@ -360,7 +360,7 @@ class EvaluationOrchestrator:
             available_types = self.dataset_registry.list_supported_types()
             logger.error(
                 "❌ Unsupported eval_type "
-                f"'{eval_type}' in dataset configuration #{index+1}"
+                f"'{eval_type}' in dataset configuration #{index + 1}"
             )
             logger.error(f"💡 Supported eval_types: {available_types}")
             raise ValueError(f"Unsupported eval_type: {eval_type}")

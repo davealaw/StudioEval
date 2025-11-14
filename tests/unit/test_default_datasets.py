@@ -27,15 +27,15 @@ class TestDefaultDatasetConfigurations:
             assert isinstance(dataset_config, dict), f"Dataset {i} is not a dict"
 
             for field in required_fields:
-                assert (
-                    field in dataset_config
-                ), f"Dataset {i} missing required field: {field}"
-                assert (
-                    dataset_config[field] is not None
-                ), f"Dataset {i} has None value for: {field}"
-                assert (
-                    dataset_config[field] != ""
-                ), f"Dataset {i} has empty string for: {field}"
+                assert field in dataset_config, (
+                    f"Dataset {i} missing required field: {field}"
+                )
+                assert dataset_config[field] is not None, (
+                    f"Dataset {i} has None value for: {field}"
+                )
+                assert dataset_config[field] != "", (
+                    f"Dataset {i} has empty string for: {field}"
+                )
 
     def test_default_datasets_eval_types_are_valid(self):
         """Test that all default dataset eval_types are supported."""
@@ -44,9 +44,9 @@ class TestDefaultDatasetConfigurations:
 
         for i, dataset_config in enumerate(default_datasets_to_run):
             eval_type = dataset_config["eval_type"]
-            assert (
-                eval_type in supported_types
-            ), f"Dataset {i} has unsupported eval_type: {eval_type}"
+            assert eval_type in supported_types, (
+                f"Dataset {i} has unsupported eval_type: {eval_type}"
+            )
 
     def test_default_datasets_have_consistent_structure(self):
         """Test that all dataset configs have consistent field structure."""
@@ -59,26 +59,26 @@ class TestDefaultDatasetConfigurations:
         for i, dataset_config in enumerate(default_datasets_to_run):
             config_keys = set(dataset_config.keys())
             # Allow some configs to have additional optional fields
-            assert expected_keys.issubset(
-                config_keys
-            ), f"Dataset {i} missing keys: {expected_keys - config_keys}"
+            assert expected_keys.issubset(config_keys), (
+                f"Dataset {i} missing keys: {expected_keys - config_keys}"
+            )
 
     def test_default_datasets_names_are_unique(self):
         """Test that dataset names are unique across all configs."""
         dataset_names = [config["dataset_name"] for config in default_datasets_to_run]
         unique_names = set(dataset_names)
 
-        assert len(dataset_names) == len(
-            unique_names
-        ), "Duplicate dataset names found in default configs"
+        assert len(dataset_names) == len(unique_names), (
+            "Duplicate dataset names found in default configs"
+        )
 
     def test_default_datasets_paths_are_strings(self):
         """Test that all dataset paths are strings."""
         for i, dataset_config in enumerate(default_datasets_to_run):
             path = dataset_config["dataset_path"]
-            assert isinstance(
-                path, str
-            ), f"Dataset {i} path is not a string: {type(path)}"
+            assert isinstance(path, str), (
+                f"Dataset {i} path is not a string: {type(path)}"
+            )
             assert len(path) > 0, f"Dataset {i} path is empty"
 
 
@@ -109,9 +109,9 @@ class TestDefaultDatasetTypes:
 
         # Should cover at least 70% of supported types
         coverage = len(default_types) / len(all_supported)
-        assert (
-            coverage >= 0.7
-        ), f"Default datasets only cover {coverage:.1%} of supported types"
+        assert coverage >= 0.7, (
+            f"Default datasets only cover {coverage:.1%} of supported types"
+        )
 
 
 class TestDefaultDatasetConfiguration:
@@ -129,9 +129,9 @@ class TestDefaultDatasetConfiguration:
 
         for config in custom_mcq_configs:
             # Should have JSONL files
-            assert config["dataset_path"].endswith(
-                ".jsonl"
-            ), f"Custom MCQ should use JSONL: {config['dataset_path']}"
+            assert config["dataset_path"].endswith(".jsonl"), (
+                f"Custom MCQ should use JSONL: {config['dataset_path']}"
+            )
 
     def test_huggingface_configurations(self):
         """Test HuggingFace dataset configurations."""
@@ -163,13 +163,13 @@ class TestDefaultDatasetConfiguration:
                     # Optional fields can be None, but if present should be valid types
                     if value is not None:
                         if field in ["seed", "sample_size"]:
-                            assert isinstance(
-                                value, int
-                            ), f"Dataset {i} {field} should be int or None"
+                            assert isinstance(value, int), (
+                                f"Dataset {i} {field} should be int or None"
+                            )
                         elif field in ["subset", "split"]:
-                            assert isinstance(
-                                value, str
-                            ), f"Dataset {i} {field} should be str or None"
+                            assert isinstance(value, str), (
+                                f"Dataset {i} {field} should be str or None"
+                            )
 
 
 class TestDefaultDatasetValidation:
@@ -252,9 +252,9 @@ class TestDatasetConfigurationIntegration:
             }
 
             for key in dataset_specific_keys:
-                assert (
-                    key in param_names or key in common_params
-                ), f"Config key '{key}' not in evaluator params for {eval_type}"
+                assert key in param_names or key in common_params, (
+                    f"Config key '{key}' not in evaluator params for {eval_type}"
+                )
 
     def test_default_configs_provide_full_coverage(self):
         """Test that default configs provide examples of all major features."""
@@ -264,12 +264,12 @@ class TestDatasetConfigurationIntegration:
         custom_types = {"custom_mcq", "grammar", "math"}
         hf_types = {"arc", "mmlu", "gsm8k"}
 
-        assert (
-            len(set(eval_types) & custom_types) >= 2
-        ), "Should have multiple custom dataset types"
-        assert (
-            len(set(eval_types) & hf_types) >= 2
-        ), "Should have multiple HuggingFace dataset types"
+        assert len(set(eval_types) & custom_types) >= 2, (
+            "Should have multiple custom dataset types"
+        )
+        assert len(set(eval_types) & hf_types) >= 2, (
+            "Should have multiple HuggingFace dataset types"
+        )
 
 
 class TestDatasetConfigurationRobustness:

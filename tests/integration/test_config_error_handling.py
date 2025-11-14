@@ -170,9 +170,9 @@ class TestConfigFileErrorHandling:
 
         # Verify that no models were loaded (config validation happens first)
         assert len(load_calls) == 0, "No models should be loaded when config is invalid"
-        assert (
-            len(unload_calls) == 0
-        ), "No models should need unloading when none were loaded"
+        assert len(unload_calls) == 0, (
+            "No models should need unloading when none were loaded"
+        )
 
     def test_multiple_models_with_config_error(self, orchestrator, caplog):
         """Test that config errors prevent all model evaluation (fail-fast behavior)."""

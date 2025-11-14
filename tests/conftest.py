@@ -52,7 +52,7 @@ def sample_math_data():
     return [
         {
             "question": (
-                "If John has 5 apples and gives away 2, how many does he have " "left?"
+                "If John has 5 apples and gives away 2, how many does he have left?"
             ),
             "answer": 3,
         },
