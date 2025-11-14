@@ -1,10 +1,23 @@
 import logging
+from typing import Any
 
-import lmstudio
+try:
+    import lmstudio
+except ImportError:  # pragma: no cover
+    lmstudio = None  # type: ignore[assignment]
 
 from config.comm_config import get_comm_config
 
 logger = logging.getLogger(__name__)
+
+
+def _require_lmstudio() -> Any:
+    if lmstudio is None:
+        raise RuntimeError(
+            "The LM Studio Python client is not installed. "
+            "Install it from https://lmstudio.ai or skip LM Studio features."
+        )
+    return lmstudio
 
 
 def _get_lmstudio_error_cls() -> type[Exception]:
@@ -49,6 +62,10 @@ def is_lm_studio_server_running():
     """
     Checks if LM Studio is running by listing currently loaded models via IPC.
     """
+    if lmstudio is None:
+        logger.error("LM Studio client not installed; cannot query server status.")
+        return False
+
     try:
         _ = lmstudio.list_loaded_models()
         return True
@@ -70,8 +87,10 @@ def query_model(prompt, model_key="local-model", current=0):
     cfg = get_comm_config()
     logger.debug(f"📤 Prompt sent to model (question {current + 1}):\n{prompt}\n")
 
+    client = _require_lmstudio()
+
     try:
-        model = lmstudio.llm(model_key)
+        model = client.llm(model_key)
 
         # Not thinking improves performance for some Qwen3 thinking models.
         # However, results are worse with all but Grammar and Creative writing
@@ -80,7 +99,7 @@ def query_model(prompt, model_key="local-model", current=0):
         #    prompt += " /no_think"
 
         system_prompt = cfg.get("SYSTEM_PROMPT", "You are a helpful assistant.")
-        chat = lmstudio.Chat(system_prompt)
+        chat = client.Chat(system_prompt)
         chat.add_user_message(prompt)
 
         gen_params = cfg.get("GENERATION_PARAMS", {})
@@ -123,6 +142,10 @@ def list_models():
         If an error occurs, an empty list is returned.
     """
     try:
+        if lmstudio is None:
+            logger.error("LM Studio client not installed; cannot list models.")
+            return []
+
         models = lmstudio.list_downloaded_models("llm")
         _ = models[0].info.architecture  # Trigger loading of model info
         return [m.model_key for m in models if hasattr(m, "model_key")]
@@ -143,6 +166,10 @@ def list_models_with_arch():
             LLMs. If an error occurs, an empty dict is returned.
     """
     try:
+        if lmstudio is None:
+            logger.error("LM Studio client not installed; cannot list models.")
+            return {}
+
         models = lmstudio.list_downloaded_models("llm")
         return {
             m.model_key: getattr(m.info, "architecture", "").strip().lower()
@@ -164,6 +191,10 @@ def list_loaded_models():
         If an error occurs, an empty list is returned.
     """
     try:
+        if lmstudio is None:
+            logger.error("LM Studio client not installed; cannot list models.")
+            return []
+
         return lmstudio.list_loaded_models("llm")
     except (LMStudioError, OSError) as e:
         logger.error(f"Failed to list loaded models: {e}")
@@ -181,7 +212,8 @@ def load_model(model_key):
     """
     try:
         logger.info(f"🔄 Loading model: {model_key}...")
-        lmstudio.llm(model_key)
+        client = _require_lmstudio()
+        client.llm(model_key)
         logger.info(f"✅ Loaded model: {model_key}")
     except (LMStudioError, OSError) as e:
         logger.error(f"Failed to load model {model_key}: {e}")
@@ -200,6 +232,10 @@ def unload_model(model_key=None):
         None
     """
     try:
+        if lmstudio is None:
+            logger.error("LM Studio client not installed; cannot unload models.")
+            return
+
         model = lmstudio.llm()
         model.unload()
         logger.info(
